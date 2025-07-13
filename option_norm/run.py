@@ -1,7 +1,9 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(__file__, '..', '..')))
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from helpers import save_asset, report, cached
+from lib.helpers import configure_report, report
 from scipy.stats import norm
 from scipy.optimize import minimize
 import matplotlib.pyplot as plt
@@ -11,8 +13,8 @@ from misc import prune_params, fit_multi_init
 import plots
 
 np.random.seed(0)
-show=True
 
+configure_report("option_norm/readme.md")
 
 doc_before = r"""
 Option Normalisation using Historical Data
@@ -26,6 +28,8 @@ Premiums calculated for each period and vol quantile:
 
 Each return has its own risk free rate, so separate discount applied to each point, instead of appluing single discount
 to aggregated premium.
+
+Run `python option_norm/run.py`.
 """
 
 doc_after = """
@@ -61,7 +65,7 @@ doc_after = """
 """
 
 def load():
-  df = pd.read_csv('data/put_premiums.csv')
+  df = pd.read_csv('option_norm/data/put_premiums.tsv', sep='\t')
   return df
 
 def estimate_mmean(df):
