@@ -15,16 +15,16 @@ from lib.helpers import save_asset
 show=False
 
 def plot_lmean(title, df, model=False):
-  vols   = sorted(df.vol_dc.unique())
+  vol_dcs   = sorted(df.vol_dc.unique())
   cmap   = plt.get_cmap('coolwarm')
-  colors = cmap(np.linspace(0, 1, len(vols)))
+  colors = cmap(np.linspace(0, 1, len(vol_dcs)))
 
   def _plot_raw(df, ax):
     ax.set_xlabel('Period (days)')
     ax.set_ylabel('Mean')
     ax.set_title('Mean, E[S_T/S_0] at expiration')
     # ax.set_yscale('log')
-    for i, v in enumerate(vols):
+    for i, v in enumerate(vol_dcs):
       sub = df[df.vol_dc == v].sort_values('period')
       x, y = sub.period, sub.mmean_true
       ax.scatter(x, y, color=colors[i], s=20, alpha=0.7, edgecolor='k', lw=0.2, label=f'{v}')
@@ -51,7 +51,7 @@ def plot_lmean(title, df, model=False):
     ax.set_ylabel('Trans Mean')
     ax.set_title('Trans Mean, log(E[S_T/S_0])/T (vol 10 not shown)')
     ax.set_yscale('log')
-    for i, v in enumerate(vols):
+    for i, v in enumerate(vol_dcs):
       sub = df[df.vol_dc == v].sort_values('period')
       x, y = sub.period, sub.mmean_true_norm
       ax.scatter(x, y, color=colors[i], s=20, alpha=0.7, edgecolor='k', lw=0.2, label=f'{v}')
@@ -70,7 +70,7 @@ def plot_lmean(title, df, model=False):
     ax.set_ylabel('Rel Error')
     ax.set_title('Relative Error (vol 10 not shown)')
     # ax.set_yscale('log')
-    for i, v in enumerate(vols):
+    for i, v in enumerate(vol_dcs):
       sub = df[df.vol_dc == v].sort_values('period')
       x, y = sub.period, sub.rel_error
       ax.scatter(x, y, color=colors[i], s=20, alpha=0.7, edgecolor='k', lw=0.2)

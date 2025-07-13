@@ -17,6 +17,13 @@ The data 250 stocks, all stocks start from 1972 and end in 2025.
     - scalep_d_t: positive current Scale[log r] as sqrt EMA[(log R)^2] | log R > 0
     - scalen_d_t: negative current Scale[log r] as sqrt EMA[(log R)^2] | log R < 0
 
+Additional, pre computed fields
+
+    - vol         - same as scale_d_t
+    - vol_q       - vol quantile
+    - vol_dc      - vol decile
+    - vol_dc_mian - median vol for decile
+
 # Bankrupts
 
 Data has survivorship bias, adding bankrupts explicitly.
