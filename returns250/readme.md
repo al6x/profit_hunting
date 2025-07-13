@@ -1,5 +1,4 @@
-The dataset: N stocks (250), current volatility and future annual log returns for N years (all stocks start from
-1972 and end in 2025).
+The data 250 stocks, all stocks start from 1972 and end in 2025.
 
     - symbol: Stock symbol
 
