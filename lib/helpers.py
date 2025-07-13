@@ -19,17 +19,19 @@ def cached(key, get):
   return result
 
 
-class ReportConfig:
-  def __init__(self, report_path):
-    self.report_path = report_path
-    self.assets_path = os.path.splitext(report_path)[0]
-    self.first_call = True
-
 report_config = None
 
-def configure_report(report_path):
+def configure_report(report_path, asset_path, asset_url_path):
   global report_config
-  report_config = ReportConfig(report_path)
+
+  class ReportConfig:
+    def __init__(self):
+      self.report_path = report_path
+      self.asset_path = asset_path
+      self.asset_url_path = asset_url_path
+      self.first_call = True
+
+  report_config = ReportConfig()
 
 def report(msg, print_=True):
   if not report_config:
@@ -75,7 +77,7 @@ def save_asset(obj, name):
     return s.strip('-').lower()
 
   # base_path, _ = os.path.splitext(report_path)
-  path = f'{report_config.assets_path}/{safe_name(name)}.png'
+  path = f'{report_config.asset_path}/{safe_name(name)}.png'
   os.makedirs(os.path.dirname(path), exist_ok=True)
   if hasattr(obj, "savefig"):
     obj.savefig(path)
@@ -84,4 +86,6 @@ def save_asset(obj, name):
       f.write(obj)
   else:
     raise ValueError("Unsupported asset type: expected figure or string")
-  report(f'![{name}]({path})')
+
+  url_path = f"{report_config.asset_url_path}/{safe_name(name)}.png" if report_config.asset_url_path else f"{safe_name(name)}.png"
+  report(f'![{name}]({url_path})')

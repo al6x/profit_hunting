@@ -14,7 +14,7 @@ import plots
 
 np.random.seed(0)
 
-configure_report("option_norm/readme.md")
+configure_report(report_path="option_norm/readme.md", asset_path="option_norm/readme", asset_url_path='readme')
 
 doc_before = r"""
 Option Normalisation using Historical Data

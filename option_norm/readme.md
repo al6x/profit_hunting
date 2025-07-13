@@ -38,9 +38,9 @@ Found params: [-0.0008, 0.0076, 0.0392, 3.3841, 0.0033, -0.0038], loss: 1.2624
 
 ### Mean E[R | T, vol]
 
-![Mean E[R], by period and vol (model - solid lines)](option_norm/readme/mean-e-r-by-period-and-vol-model-solid-lines.png)
+![Mean E[R], by period and vol (model - solid lines)](readme/mean-e-r-by-period-and-vol-model-solid-lines.png)
 
-![Mean E[R]](option_norm/readme/mean-e-r.png)
+![Mean E[R]](readme/mean-e-r.png)
 
 ### Estimating Scale[log R]
 
@@ -58,9 +58,9 @@ Found params: [-0.7738, 1.8570, 1.2634, -0.1577, 0.2550, 0.0000, 0.0000, -0.0382
 
 ### Scale[log R | T, vol]
 
-![Estimated Scale (at expiration)](option_norm/readme/estimated-scale-at-expiration.png)
+![Estimated Scale (at expiration)](readme/estimated-scale-at-expiration.png)
 
-![Vol by period, as EMA((log r)^2)^0.5](option_norm/readme/vol-by-period-as-ema-log-r-2-0-5.png)
+![Vol by period, as EMA((log r)^2)^0.5](readme/vol-by-period-as-ema-log-r-2-0-5.png)
 
 ### Strike normalisation
 
@@ -79,47 +79,47 @@ should be consistent across periods and volatilities, as distribution should be 
 Thre's minor mistake `E[log R] = log E[R] - 0.5*Scale[log R]^2` should use positive part of scale, but error is
 very small, ignoring.
 
-![Normalised Strikes vs True Normalised Strikes](option_norm/readme/normalised-strikes-vs-true-normalised-strikes.png)
+![Normalised Strikes vs True Normalised Strikes](readme/normalised-strikes-vs-true-normalised-strikes.png)
 
 ### Premium
 
 Raw Strike K
 
-![Premium P, Raw Strike K](option_norm/readme/premium-p-raw-strike-k.png)
+![Premium P, Raw Strike K](readme/premium-p-raw-strike-k.png)
 
-![Premium P, Raw Strike K, log scale](option_norm/readme/premium-p-raw-strike-k-log-scale.png)
+![Premium P, Raw Strike K, log scale](readme/premium-p-raw-strike-k-log-scale.png)
 
 Norm Strike `P(R < K | vol)` (probability of ITM or F(d2) from BlackScholes)
 
-![Premium, Norm Strike P(R < K | vol)](option_norm/readme/premium-norm-strike-p-r-k-vol.png)
+![Premium, Norm Strike P(R < K | vol)](readme/premium-norm-strike-p-r-k-vol.png)
 
 Norm Strike `(log K - E[log R])/Scale[log R]` (z score in log space or d2 from BlackScholes)
 
-![Premium P, Norm Strike (log K - E[log R])/Scale[log R]](option_norm/readme/premium-p-norm-strike-log-k-e-log-r-scale-log-r.png)
+![Premium P, Norm Strike (log K - E[log R])/Scale[log R]](readme/premium-p-norm-strike-log-k-e-log-r-scale-log-r.png)
 
-![Premium P, Norm Strike (log K - E[log R])/Scale[log R], log scale](option_norm/readme/premium-p-norm-strike-log-k-e-log-r-scale-log-r-log-scale.png)
+![Premium P, Norm Strike (log K - E[log R])/Scale[log R], log scale](readme/premium-p-norm-strike-log-k-e-log-r-scale-log-r-log-scale.png)
 
 ### Norm Premium
 
 Normalising premium as `P/E[R]/Scale[log R]`
 
-![Norm Premium P/E[R]/Scale[log R], Norm Strike (log K - E[log R])/Scale[log R]](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-log-k-e-log-r-scale-log-r.png)
+![Norm Premium P/E[R]/Scale[log R], Norm Strike (log K - E[log R])/Scale[log R]](readme/norm-premium-p-e-r-scale-log-r-norm-strike-log-k-e-log-r-scale-log-r.png)
 
-![Norm Premium P/E[R]/Scale[log R], Norm Strike (log K - E[log R])/Scale[log R], log scale](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-log-k-e-log-r-scale-log-r-log-scale.png)
+![Norm Premium P/E[R]/Scale[log R], Norm Strike (log K - E[log R])/Scale[log R], log scale](readme/norm-premium-p-e-r-scale-log-r-norm-strike-log-k-e-log-r-scale-log-r-log-scale.png)
 
-![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
+![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
 ### Ratio of Premium at expiration to max possible over option lifetime
 
-![Ratio of Premium Min / Exp (calls solid)](option_norm/readme/ratio-of-premium-min-exp-calls-solid.png)
+![Ratio of Premium Min / Exp (calls solid)](readme/ratio-of-premium-min-exp-calls-solid.png)
 
 #note bounds for american call: eu < am < 2eu
 
 ### Skew
 
-![scalen_t2 vs scalep_t2, x - sort(period,vol)](option_norm/readme/scalen-t2-vs-scalep-t2-x-sort-period-vol.png)
+![scalen_t2 vs scalep_t2, x - sort(period,vol)](readme/scalen-t2-vs-scalep-t2-x-sort-period-vol.png)
 
-![MMean E[R] with scale vs scalep, x - sort(period,vol)](option_norm/readme/mmean-e-r-with-scale-vs-scalep-x-sort-period-vol.png)
+![MMean E[R] with scale vs scalep, x - sort(period,vol)](readme/mmean-e-r-with-scale-vs-scalep-x-sort-period-vol.png)
 
 ### Data
 
