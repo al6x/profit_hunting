@@ -18,7 +18,6 @@ def cached(key, get):
   with open(path, 'wb') as f: pickle.dump(result, f)
   return result
 
-
 report_config = None
 
 def configure_report(report_path, asset_path, asset_url_path):
@@ -33,7 +32,7 @@ def configure_report(report_path, asset_path, asset_url_path):
 
   report_config = ReportConfig()
 
-def report(msg, print_=True):
+def report(msg, print_=True, clear=True):
   if not report_config:
     raise ValueError("no report config")
 
@@ -53,21 +52,21 @@ def report(msg, print_=True):
 
   if report_config.first_call:
     report_config.first_call = False
-    if os.path.exists(report_config.report_path):
+    if clear and os.path.exists(report_config.report_path):
       os.remove(report_config.report_path)
 
   msg = dedent(msg)
 
-  if print_:
-    indented_msg = "\n".join("  " + line for line in msg.splitlines())
-    print(indented_msg + "\n")
+  # if print_:
+  #   indented_msg = "\n".join("  " + line for line in msg.splitlines())
+  #   print(indented_msg + "\n")
 
   # os.makedirs(os.path.dirname(report_path), exist_ok=True)
   with open(report_config.report_path, "a") as f:
     msg = turn2space_indent_into4(replace_h1_with_h3(msg)).rstrip()
     f.write(msg + "\n\n")
 
-def save_asset(obj, name):
+def save_asset(obj, name, clear=True):
   if not report_config:
     raise ValueError("no report config")
 
@@ -88,4 +87,4 @@ def save_asset(obj, name):
     raise ValueError("Unsupported asset type: expected figure or string")
 
   url_path = f"{report_config.asset_url_path}/{safe_name(name)}.png" if report_config.asset_url_path else f"{safe_name(name)}.png"
-  report(f'![{name}]({url_path})')
+  report(f'![{name}]({url_path})', clear=clear)

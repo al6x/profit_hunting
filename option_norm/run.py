@@ -198,7 +198,7 @@ def estimate_scale(df):
 
   return lambda period, vol: scale_(period, vol, P)
 
-def chapter_mmean(df, mmean_):
+def c_mmean(df, mmean_):
   report("# Mean E[R | T, vol]")
 
   def mean_fitting_info():
@@ -227,14 +227,14 @@ def chapter_mmean(df, mmean_):
     vol_range=(df['vol'].min(), df['vol'].max()), period_range=(df['period'].min(), df['period'].max()),
   )
 
-def chapter_scale(df, scale_):
+def c_scale(df, scale_):
   report("# Scale[log R | T, vol]")
 
   plots.plot_estimated_scale('Estimated Scale (at expiration)', df, scale_)
 
   plots.plot_vols_by_periods('Vol by period, as EMA((log r)^2)^0.5', df)
 
-def chapter_skew(df):
+def c_skew(df):
   report("# Skew")
 
   df = df[['period', 'lmean_t2', 'scale_t2', 'scalep_t2', 'scalen_t2', 'vol_dc']].drop_duplicates() \
@@ -245,7 +245,7 @@ def chapter_skew(df):
   plots.plot_mmean_ratio("scalen_t2 vs scalep_t2, x - sort(period,vol)", df['scale_t2']/df['scalep_t2'])
   plots.plot_mmean_ratio("MMean E[R] with scale vs scalep, x - sort(period,vol)", mmean/mmeanp)
 
-def chapter_normalised_strikes(df, scale_, mmean_):
+def c_normalised_strikes(df, scale_, mmean_):
   report("""
     # Strike normalisation
 
@@ -275,7 +275,7 @@ def chapter_normalised_strikes(df, scale_, mmean_):
     df, x='m', y='m_true', min=-4, max=4
   )
 
-def chapter_premiums(df):
+def c_premiums(df):
   report("# Premium")
 
   df = df.copy()
@@ -354,15 +354,15 @@ def run():
   df = df[(df.period != 1095)]
 
   mmean_ = estimate_mmean(df)
-  chapter_mmean(df, mmean_)
+  c_mmean(df, mmean_)
 
   scale_ = estimate_scale(df)
-  chapter_scale(df, scale_)
+  c_scale(df, scale_)
 
-  chapter_normalised_strikes(df, scale_, mmean_)
-  chapter_premiums(df)
+  c_normalised_strikes(df, scale_, mmean_)
+  c_premiums(df)
 
-  chapter_skew(df)
+  c_skew(df)
 
   report(doc_after, False)
 
@@ -370,7 +370,7 @@ def tmp():
   df = load()
 
   mmean_ = estimate_mmean(df)
-  chapter_mmean(df, mmean_)
+  c_mmean(df, mmean_)
 
 if __name__ == "__main__":
   run()

@@ -38,3 +38,29 @@ def load_with_bankrupts():
     return df
 
   return pd.concat(get_data_for_period(p) for p in periods)
+
+# def adjust_data_mmean(df):
+#   # Description and charts in `/mean`
+
+#   # Adjusting means of vol9 and vol10
+#   adjustments = [
+#     # vol10
+#     [10, 30,   0.95],
+#     [10, 60,   0.85],
+#     [10, 91,   0.76],
+#     [10, 182,  0.68],
+#     [10, 365,  0.68],
+#     [10, 730,  0.74],
+#     [10, 1095, 0.73],
+#     # vol9
+#     [9,  30,   0.98],
+#     [9,  60,   0.93],
+#     [9,  91,   0.96],
+#     [9,  182,  0.97],
+#     [9,  365,  0.93],
+#     [9,  730,  0.93],
+#     [9,  1095, 0.95],
+
+#   ]
+#   for vol_dc, period, factor in adjustments:
+#     df.loc[(df['period_d'] == period) & (df['vol_dc'] == vol_dc), 'lr_t2'] *= factor

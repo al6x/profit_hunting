@@ -8,3 +8,8 @@ Profit hunting experiments and explorations:
 [Option Normalisation](option_norm)
 
 ![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
+
+### TODO
+
+- option_norm: rescale mmean plot as `(365/period)E[R]`.
+- maybe add streamlit, nbview viola, Pluto.jl

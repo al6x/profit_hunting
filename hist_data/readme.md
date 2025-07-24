@@ -1,5 +1,7 @@
 The data 250 stocks, all stocks start from 1972 and end in 2025.
 
+Data has both comission (large cap) and omission biases (no bankrupts).
+
     - symbol: Stock symbol
 
     - period_d: Period days [30, 60, 91, 182, 365, 730, 1095]
@@ -26,7 +28,7 @@ Additional, pre computed fields
 
 # Bankrupts
 
-Data has survivorship bias, adding bankrupts explicitly.
+Data has omission bias - no bankrupts, adding bankrupts explicitly.
 
 The **annual bankruptsy probability** conditional on company volatility `P(b|σ,T=365)`. Defined as PMF for each
 quantile, derived from `logit P(b∣σ,T=365)=α+βσ, β~3-4 and α = total rate`. With total bankruptcy probability per
