@@ -1,15 +1,15 @@
-Profit hunting experiments and explorations:
+Profit hunting experiments and explorations.
 
 - Financial risk and uncertainty.
 - Portfolio protection with put options.
 - Bounded-loss option strategies.
 - Financial statement analysis (Greenblatt).
 
-[Stock Expected Return E[R]](mean)
+[Stock Expected Return E[R]](mean) by period, volatility, risk free rate
 
 ![Mean E[R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](mean/readme/mean-e-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-[Stock Option Normalisation](option_norm)
+[Stock Option Normalisation](option_norm) by period, volatility
 
 ![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
