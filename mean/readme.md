@@ -1,6 +1,6 @@
 Estimating expected stock return E[R] from historical data.
 
-[add top image]
+Exploring the `{T, Vol, RF Rate, E[R]}` shape.
 
 Run `julia mean/mean.jl`.
 
@@ -30,31 +30,31 @@ also looks to be good as it's has almost no effect on the observable mean.
 
 ### Exploring Log Mean E[log R] with 5 rf groups
 
-![Log Mean E[log R] by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-by-t-vol-and-t-rf-solid-adjusted.png)
+![Log Mean E[log R] rfg by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-rfg-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Log Mean (365/period)(E[log R]) by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-by-t-vol-and-t-rf-solid-adjusted.png)
+![Norm Log Mean (365/period)(E[log R]) rfg by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-rfg-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Log Mean E[log R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
+![Log Mean E[log R] rfg (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-rfg-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-![Norm Log Mean (365/period)E[log R] (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
+![Norm Log Mean (365/period)E[log R] rfg (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rfg-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
 
-![Log Mean E[log R] (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
+![Log Mean E[log R] rfg (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-rfg-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
 
-![Norm Log Mean (365/period)E[log R] (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
+![Norm Log Mean (365/period)E[log R] rfg (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rfg-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
 
 ### Exploring Log Mean E[log R] with 10 rf groups
 
-![Log Mean E[log R] by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-by-t-vol-and-t-rf-solid-adjusted.png)
+![Log Mean E[log R] rf_dc by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-rf-dc-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Log Mean (365/period)(E[log R]) by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-by-t-vol-and-t-rf-solid-adjusted.png)
+![Norm Log Mean (365/period)(E[log R]) rf_dc by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-rf-dc-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Log Mean E[log R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
+![Log Mean E[log R] rf_dc (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-rf-dc-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-![Norm Log Mean (365/period)E[log R] (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
+![Norm Log Mean (365/period)E[log R] rf_dc (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rf-dc-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
 
-![Log Mean E[log R] (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
+![Log Mean E[log R] rf_dc (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-rf-dc-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
 
-![Norm Log Mean (365/period)E[log R] (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
+![Norm Log Mean (365/period)E[log R] rf_dc (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rf-dc-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
 
 ### Data
 

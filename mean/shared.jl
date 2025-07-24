@@ -6,8 +6,6 @@ using .Lib, .Report
 begin
   # Config
 
-  plots_py = pyimport("mean.plots")
-
   Random.seed!(0)
   Report.configure!(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path="readme")
   py"""

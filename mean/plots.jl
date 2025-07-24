@@ -49,6 +49,7 @@ function plot_xyc_by(title, ds; x, y, y2=nothing, c, by, ydomain=nothing, palett
   fig.suptitle(ftitle); plt.tight_layout()
   if show_plots: plt.show()
   save_asset(fig, ftitle, clear=False)
+  plt.close(fig)
   """
 end
 
@@ -115,6 +116,7 @@ function plot_by_vol_by_rf(title, ds_vol, ds_rf; ylabel, solid_label, ydomain, y
 
       if show: plt.show()
       save_asset(fig, title, clear=False)
+      plt.close(fig)
 
   plot_grid(f"{title} by (T, vol) and (T, rf), (solid - {solid_label})", [
     lambda ax: plot_mmean(
