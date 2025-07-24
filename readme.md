@@ -7,7 +7,7 @@ Profit hunting experiments and explorations:
 
 [Stock Expected Return E[R]](mean)
 
-![Mean E[R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/mean-e-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
+![Mean E[R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](mean/readme/mean-e-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
 [Stock Option Normalisation](option_norm)
 
