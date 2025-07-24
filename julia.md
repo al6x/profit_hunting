@@ -24,3 +24,6 @@ The whole module system is overengineered garbage.
 
 vscodedisplay(means_vol_rf)
 ds2 = ds[in.(ds.rfg, Ref([1,5])), :]
+performance fuse to speed up @. 3x^2 + 4x + 7x^3
+performance for captured variables define type and make a copy with let f = let r = r; x -> x * r; end
+performance StaticArrays.jl x5-30 faster
