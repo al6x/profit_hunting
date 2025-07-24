@@ -15,7 +15,7 @@ function configure!(; report_path, asset_path, asset_url_path::Union{AbstractStr
 end
 
 function report(msg::AbstractString; print=true)
-  function indent2to4(text::AbstractString)
+  function indent2to4(text)
     lines = split(text, '\n'; keepempty=true)
     out = String[]
     start_block = true
@@ -31,7 +31,6 @@ function report(msg::AbstractString; print=true)
   end
 
   replace_h1_with_h3(text) = replace(text, r"(^|\n)# " => s"\1### ")
-  # replace_h1_with_h3(text) = replace(text, r"(^|\n)# " => x -> "$(x)### ")
   space_indent2(str) = join("  " .* split(str, '\n'), "\n")
 
   cfg = Report.config[]; (cfg === nothing) && error("No report config")
