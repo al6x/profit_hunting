@@ -11,7 +11,7 @@ function SkewT(μ::Float64, σ::Float64, ν::Float64, λ::Float64)
   a = 4λ*c * ((ν-2)/(ν-1))
   b = sqrt(1+3λ^2-a^2)
   kernelinvariant = 1/ (ν-2)
-  logconst        = log(b)+log(c)
+  logconst = log(b)+log(c)
 
   SkewT(μ, σ, ν, λ, a, b, kernelinvariant, logconst)
 end
