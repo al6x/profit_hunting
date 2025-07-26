@@ -2,7 +2,7 @@ import Random, SpecialFunctions, StatsFuns
 
 struct SkewT
   μ::Float64; σ::Float64; ν::Float64; λ::Float64
-  a::Float64; b::Float64; c::Float64; kernelinvariant::Float64; logconst::Float64
+  a::Float64; b::Float64; kernelinvariant::Float64; logconst::Float64
 end
 
 function SkewT(μ::Float64, σ::Float64, ν::Float64, λ::Float64)
@@ -13,7 +13,7 @@ function SkewT(μ::Float64, σ::Float64, ν::Float64, λ::Float64)
   kernelinvariant = 1/ (ν-2)
   logconst        = log(b)+log(c)
 
-  SkewT(μ, σ, ν, λ, a, b, c, kernelinvariant, logconst)
+  SkewT(μ, σ, ν, λ, a, b, kernelinvariant, logconst)
 end
 
 # logkernel is faster than pdf for MLE
