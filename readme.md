@@ -1,5 +1,6 @@
 Profit hunting experiments and explorations.
 
+- For **individual** risking their **own money**, not funds or institutions.
 - Financial risk and uncertainty.
 - Portfolio protection with put options.
 - Bounded-loss option strategies.
@@ -16,4 +17,4 @@ Profit hunting experiments and explorations.
 ### TODO
 
 - option_norm: rescale mmean plot as `(365/period)E[R]`.
-- maybe add streamlit, nbview viola, Pluto.jl
+- maybe add HoloViz https://panel.holoviz.org/reference/index.html (integrates with vscode and live update), streamlit, Pluto.jl

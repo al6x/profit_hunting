@@ -69,8 +69,8 @@ function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
 
   means_vol_rf = group_by_vol_rf(ds_orig, ops; volg=:volg, rfg)
   means_vol_rf_trunc = group_by_vol_rf(ds_trunc, ops; volg=:volg, rfg)
-  means_vol_rf.adjusted = means_vol_rf_trunc.mean
-  means_vol_rf.nadjusted = means_vol_rf_trunc.nmean
+  means_vol_rf.adjusted = means_vol_rf_trunc.mean ./ (means_vol_rf.vol/0.015)
+  means_vol_rf.nadjusted = means_vol_rf_trunc.nmean ./ (means_vol_rf.vol/0.015)
   means_vol_rf.original = means_vol_rf.mean
   means_vol_rf.noriginal = means_vol_rf.nmean
 

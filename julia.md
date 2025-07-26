@@ -21,6 +21,11 @@ Clicking on function `report` doesnt' work
 
 The whole module system is overengineered garbage.
 
+Function comment code not folded with the function in vscode
+
+VSCode REPL error line numbers are not clickable
+
+end not folded for function in vscode
 
 vscodedisplay(means_vol_rf)
 ds2 = ds[in.(ds.rfg, Ref([1,5])), :]
