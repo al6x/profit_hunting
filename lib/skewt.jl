@@ -18,15 +18,15 @@ end
 
 # logkernel is faster than pdf for MLE
 @inline function logkernel(d::SkewT, x::Float64)
-  (; λ, ν, a, b, kernelinvariant) = d
-  λsign = x < (-a/b) ? -1 : 1
-  (-(ν + 1) / 2) * log1p(1/abs2(1+λ*λsign) * abs2(b*x + a) *kernelinvariant)
+  (; μ, σ, λ, ν, a, b, kernelinvariant) = d
+  z = (x - μ) / σ
+  λsign = z < (-a/b) ? -1 : 1
+  (-(ν + 1) / 2) * log1p(1/abs2(1+λ*λsign) * abs2(b*z + a) *kernelinvariant)
 end
 
 function pdf(d::SkewT, x::Float64)
-  (; μ, σ, logconst) = d
-  z = (x - μ) / σ
-  logp = logkernel(d, z) - logconst
+  (; σ, logconst) = d
+  logp = logkernel(d, x) - logconst
   exp(logp) / σ
 end
 
