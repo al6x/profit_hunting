@@ -31,21 +31,15 @@ function pdf(d::SkewT, x::Float64)
 end
 
 function cdf(d::SkewT, x::Float64)
-  # unpack parameters
   (; μ, σ, ν, λ, a, b) = d
-
-  # standardize
   z = (x - μ) / σ
 
-  # scaled arguments
-  y1 = (b*z + a)/(1 - λ) * sqrt(ν/(ν - 2))
-  y2 = (b*z + a)/(1 + λ) * sqrt(ν/(ν - 2))
+  ypart = (b*z + a) * sqrt(ν/(ν - 2))
+  y1, y2 = ypart/(1 - λ), ypart/(1 + λ)
 
-  if z < -a/b
-    return (1 - λ) * StatsFuns.tdistcdf(ν, y1)
-  else
-    return (1 - λ)/2 + (1 + λ) * (StatsFuns.tdistcdf(ν, y2) - 0.5)
-  end
+  z < -a/b ?
+    (1 - λ) * StatsFuns.tdistcdf(ν, y1) :
+    (1 - λ)/2 + (1 + λ) * (StatsFuns.tdistcdf(ν, y2) - 0.5)
 end
 
 function quantile(d::SkewT, q::Float64)
