@@ -1,25 +1,54 @@
 include("./skewt.jl")
+using PyCall, Test
 
-using Random, Test
+begin
+  py"""
+  import numpy as np
+  from arch.univariate import SkewStudent
 
-# ARCHModels.StdSkewT used for test only, it doesn't have cdf, generic form and slower recalculating constants
-# for every x.
-import ARCHModels
+  skewt = SkewStudent()
 
-function arch_skewt_pdf(μ, σ, ν, λ, x)
-  d = ARCHModels.StdSkewT(ν, λ)
-  z = (x - μ) / σ
-  iv = ARCHModels.kernelinvariants(ARCHModels.StdSkewT, d.coefs)[1]
-  logp = ARCHModels.logkernel(ARCHModels.StdSkewT, z, d.coefs, iv) - ARCHModels.logconst(ARCHModels.StdSkewT, d.coefs)
-  exp(logp) / σ
+  def skewt_pdf(η, λ, x):
+    ll = skewt.loglikelihood([η, λ], resids=np.asarray(x), sigma2=1, individual=True)
+    return np.exp(ll)
+
+  def skewt_cdf(η, λ, x):
+    return skewt.cdf(resids=x, parameters=[η, λ])
+
+  def skewt_quantile(η, λ, p):
+    return skewt.ppf(pits=p, parameters=[η, λ])
+  """
 end
 
-@testset "SkewT.pdf" begin
-  d = SkewT(1.0, 2.0, 3.0, 0.5)
-  @test pdf(d, 0.1) ≈ arch_skewt_pdf(1.0, 2.0, 3.0, 0.5, 0.1)
+@testset "SkewT pdf, cdf, quantile" begin
+  function x_test_points()
+    νs = [2.1, 3, 5, 10, 30, 100]
+    λs = [-0.97, -0.8, -0.5, -0.1, 0.0, 0.1, 0.5, 0.8, 0.97]
+    xs = [-5, -2, -1, -0.5, -0.1, 0.0, 0.1, 0.5, 1, 2, 5, 10]
+    points = [(ν, λ, x) for ν in νs, λ in λs, x in xs]
+    getindex.(points, 1), getindex.(points, 2), getindex.(points, 3)
+  end
+
+  let (νs, λs, xs) = x_test_points()
+    @test pdf.(SkewT.(0.0, 1.0, νs, λs), xs) ≈ py"skewt_pdf".(νs, λs, xs)
+    @test cdf.(SkewT.(0.0, 1.0, νs, λs), xs) ≈ py"skewt_cdf".(νs, λs, xs)
+  end
+
+  function q_test_points()
+    νs = [2.1, 3, 5, 10, 30, 100]
+    λs = [-0.97, -0.8, -0.5, -0.1, 0.0, 0.1, 0.5, 0.8, 0.97]
+    qs = [0.01, 0.1, 0.5, 0.9, 0.99]
+    points = [(ν, λ, q) for ν in νs, λ in λs, q in qs]
+    getindex.(points, 1), getindex.(points, 2), getindex.(points, 3)
+  end
+
+  let (νs, λs, qs) = q_test_points()
+    @test quantile.(SkewT.(0.0, 1.0, νs, λs), qs) ≈ py"skewt_quantile".(νs, λs, qs)
+  end
 end
 
-@testset "SkewT.cdf,quantile" begin
-  d = SkewT(1.0, 2.0, 3.0, 0.5)
-  @test cdf(d, quantile(d, 0.1)) ≈ 0.1
+@testset "SkewT fit_mle" begin
+  x = rand(SkewT(1.0, 2.0, 5.0, 0.5), 10_000);
+  (; μ, σ, ν, λ) = fit_mle(SkewT, x)
+  @test [μ, σ, ν, λ] ≈ [1.0, 2.0, 5.0, 0.5] rtol=0.05
 end

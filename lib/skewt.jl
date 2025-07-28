@@ -1,53 +1,80 @@
-import Random, SpecialFunctions, StatsFuns
+import Statistics, SpecialFunctions, StatsFuns, Optim, Distributions, Random
+import Distributions: logpdf, pdf, cdf, quantile, fit_mle
+import Random: rand
+import Statistics: mean, std
 
-struct SkewT
-  μ::Float64; σ::Float64; ν::Float64; λ::Float64
-  a::Float64; b::Float64; kernelinvariant::Float64; logconst::Float64
+struct SkewT{T <: Real} <: Distributions.ContinuousUnivariateDistribution
+  μ::T; σ::T; ν::T; λ::T
+  a::T; b::T; c::T
 end
 
-function SkewT(μ::Float64, σ::Float64, ν::Float64, λ::Float64)
-  # Precomputing constants
-  c = SpecialFunctions.gamma((ν+1)/2) / (sqrt(π*(ν-2)) * SpecialFunctions.gamma(ν/2))
-  a = 4λ*c * ((ν-2)/(ν-1))
-  b = sqrt(1+3λ^2-a^2)
-  kernelinvariant = 1/ (ν-2)
-  logconst = log(b)+log(c)
+function SkewT(μ::T, σ::T, ν::T, λ::T) where {T <: Real}
+  ν > 2.05    || throw(DomainError(ν, "ν must be > 2.05"))
+  abs(λ) < 1  || throw(DomainError(λ, "|λ| must be < 1"))
 
-  SkewT(μ, σ, ν, λ, a, b, kernelinvariant, logconst)
+  c = SpecialFunctions.loggamma((ν + 1)/2) - SpecialFunctions.loggamma(ν/2) - 0.5*log(pi*(ν - 2))
+  a = 4*λ*exp(c)*(ν - 2)/(ν - 1)
+  b = sqrt(1 + 3*λ^2 - a^2)
+
+  SkewT(μ, σ, ν, λ, a, b, c)
 end
 
-# logkernel is faster than pdf for MLE
-@inline function logkernel(d::SkewT, x::Float64)
-  (; μ, σ, λ, ν, a, b, kernelinvariant) = d
+logpdf(d::SkewT, x::Real) = begin
+  (; μ, σ, λ, ν, a, b, c) = d
   z = (x - μ) / σ
-  λsign = z < (-a/b) ? -1 : 1
-  (-(ν + 1) / 2) * log1p(1/abs2(1+λ*λsign) * abs2(b*z + a) *kernelinvariant)
+  s = sign(z + a/b)
+  llf = ((b*z + a)/(1 + s*λ))^2
+  zlogpdf = log(b) + c - ((ν + 1)/2) * log(1 + llf/(ν - 2))
+  zlogpdf - log(σ)
 end
 
-function pdf(d::SkewT, x::Float64)
-  (; σ, logconst) = d
-  logp = logkernel(d, x) - logconst
-  exp(logp) / σ
-end
+pdf(d::SkewT, x::Real) = exp(logpdf(d, x))
 
-function cdf(d::SkewT, x::Float64)
+cdf(d::SkewT, x::Real) = begin
   (; μ, σ, ν, λ, a, b) = d
   z = (x - μ) / σ
 
-  ypart = (b*z + a) * sqrt(ν/(ν - 2))
-  y1, y2 = ypart/(1 - λ), ypart/(1 + λ)
+  var   = ν/(ν - 2)
+  scale = sqrt(var)
+  d     = (b*z + a) * scale
+  y1    = d/(1 - λ)
+  y2    = d/(1 + λ)
 
   z < -a/b ?
     (1 - λ) * StatsFuns.tdistcdf(ν, y1) :
     (1 - λ)/2 + (1 + λ) * (StatsFuns.tdistcdf(ν, y2) - 0.5)
 end
 
-function quantile(d::SkewT, q::Float64)
+quantile(d::SkewT, p::Real) = begin
   (; μ, σ, ν, λ, a, b) = d
-  λconst = q < (1 - λ)/2 ? (1 - λ) : (1 + λ)
-  quant_numer = q < (1 - λ)/2 ? q : (q + λ)
-  z = 1/b * ((λconst) * sqrt((ν-2)/ν) * StatsFuns.tdistinvcdf(ν, quant_numer/λconst) - a)
+  0.0 < p < 1 || throw(DomainError(p, "p must be in (0,1)"))
+
+  thresh = (1 - λ)/2
+  q = p < thresh ?
+    StatsFuns.tdistinvcdf(ν, p/(1 - λ)) :
+    StatsFuns.tdistinvcdf(ν, 0.5 + (p - thresh)/(1 + λ))
+
+  signp = p < thresh ? -1 : 1
+  factor = sqrt((ν - 2)/ν)
+  z = (q * (1 + signp*λ) * factor - a) / b
   μ + σ*z
 end
 
-Random.rand(rng::Random.AbstractRNG, d::SkewT) = quantile(d, Random.rand(rng))
+rand(rng::Random.AbstractRNG, d::SkewT) = quantile(d, rand(rng))
+
+fit_mle(::Type{SkewT}, x::AbstractVector{<:Real}) = begin
+  init = [mean(x), log(std(x)), log(5-2.05), 0]
+  @inline decode(θ) = θ[1], exp(θ[2]), exp(θ[3]) + 2.05, tanh(θ[4])
+
+  nll(θ) = begin
+    μ, σ, ν, λ = decode(θ)
+    if ν <= 2.05 || abs(λ) >= 1 return Inf end
+    d = SkewT(μ, σ, ν, λ)
+    -sum(logpdf.(Ref(d), x))
+  end
+
+  res = Optim.optimize(nll, init, Optim.BFGS(); autodiff = :forward)
+
+  θ = Optim.converged(res) ? Optim.minimizer(res) : error("Can't estimate SkewT")
+  SkewT(decode(θ)...)
+end
