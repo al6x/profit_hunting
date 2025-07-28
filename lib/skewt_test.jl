@@ -21,9 +21,10 @@ begin
 end
 
 @testset "SkewT pdf, cdf, quantile" begin
+  νs = [2.1, 3, 5, 10, 30, 100]
+  λs = [-0.97, -0.8, -0.5, -0.1, 0.0, 0.1, 0.5, 0.8, 0.97]
+
   function x_test_points()
-    νs = [2.1, 3, 5, 10, 30, 100]
-    λs = [-0.97, -0.8, -0.5, -0.1, 0.0, 0.1, 0.5, 0.8, 0.97]
     xs = [-5, -2, -1, -0.5, -0.1, 0.0, 0.1, 0.5, 1, 2, 5, 10]
     points = [(ν, λ, x) for ν in νs, λ in λs, x in xs]
     getindex.(points, 1), getindex.(points, 2), getindex.(points, 3)
@@ -35,8 +36,6 @@ end
   end
 
   function q_test_points()
-    νs = [2.1, 3, 5, 10, 30, 100]
-    λs = [-0.97, -0.8, -0.5, -0.1, 0.0, 0.1, 0.5, 0.8, 0.97]
     qs = [0.01, 0.1, 0.5, 0.9, 0.99]
     points = [(ν, λ, q) for ν in νs, λ in λs, q in qs]
     getindex.(points, 1), getindex.(points, 2), getindex.(points, 3)
