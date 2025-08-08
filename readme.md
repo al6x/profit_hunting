@@ -14,7 +14,7 @@ Profit hunting experiments and explorations.
 
 ![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
-[Extreme Value Theory, Heavy Tails](option_norm)
+[Extreme Value Theory, Heavy Tails](evt)
 
 ![POT $(ename) 25-75 IQR](evt/readme/pot-mle-25-75-iqr.png)
 
