@@ -2,6 +2,7 @@ import Statistics, SpecialFunctions, StatsFuns, Optim, Distributions, Random
 import Distributions: logpdf, pdf, cdf, quantile, fit_mle
 import Random: rand
 import Statistics: mean, std
+import QuadGK
 
 struct SkewT{T <: Real} <: Distributions.ContinuousUnivariateDistribution
   μ::T; σ::T; ν::T; λ::T
@@ -9,6 +10,7 @@ struct SkewT{T <: Real} <: Distributions.ContinuousUnivariateDistribution
 end
 
 function SkewT(μ::T, σ::T, ν::T, λ::T) where {T <: Real}
+  σ > 0       || throw(DomainError(σ, "σ must be > 0"))
   ν > 2.05    || throw(DomainError(ν, "ν must be > 2.05"))
   abs(λ) < 1  || throw(DomainError(λ, "|λ| must be < 1"))
 
@@ -68,7 +70,7 @@ fit_mle(::Type{SkewT}, x::AbstractVector{<:Real}) = begin
 
   nll(θ) = begin
     μ, σ, ν, λ = decode(θ)
-    if ν <= 2.05 || abs(λ) >= 1 return Inf end
+    if σ < 1e-12 || ν <= 2.05 || abs(λ) >= 1 || ν > 100 return Inf end
     d = SkewT(μ, σ, ν, λ)
     -sum(logpdf.(Ref(d), x))
   end
@@ -77,4 +79,9 @@ fit_mle(::Type{SkewT}, x::AbstractVector{<:Real}) = begin
 
   θ = Optim.converged(res) ? Optim.minimizer(res) : error("Can't estimate SkewT")
   SkewT(decode(θ)...)
+end
+
+mean_exp(d::SkewT; l::Real, h::Real) = begin
+  f(x) = pdf(d, x) * exp(x)
+  QuadGK.quadgk(f, l, h)[1]
 end

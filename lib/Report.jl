@@ -2,7 +2,7 @@ module Report
 
 using ..Lib
 
-export configure!, report
+export configure!, report, save_asset
 
 mutable struct ReportConfig report_path; asset_path; asset_url_path; first_call end
 
@@ -14,8 +14,8 @@ function configure!(; report_path, asset_path, asset_url_path::Union{AbstractStr
   config[] = ReportConfig(report_path, asset_path, asset_url_path, true)
 end
 
-function report(msg::AbstractString; print=true)
-  function indent2to4(text)
+function report(msg::AbstractString; print=true, clear=true)
+  indent2to4(text) = begin
     lines = split(text, '\n'; keepempty=true)
     out = String[]
     start_block = true
@@ -37,7 +37,7 @@ function report(msg::AbstractString; print=true)
 
   if cfg.first_call
     cfg.first_call = false
-    isfile(cfg.report_path) && rm(cfg.report_path)
+    clear && isfile(cfg.report_path) && rm(cfg.report_path)
   end
 
   msg = msg |> dedent |> indent2to4 |> replace_h1_with_h3 |> rstrip
@@ -49,6 +49,33 @@ function report(msg::AbstractString; print=true)
     write(io, msg * "\n\n")
   end
   nothing
+end
+
+safe_name(s::AbstractString) =
+  s |> lowercase |>
+  x -> replace(x, r"[^a-z0-9]" => "-") |>
+  x -> replace(x, r"-+" => "-") |>
+  x -> strip(x, ['-'])
+
+function save_asset(name::AbstractString, obj; clear::Bool=true)
+  cfg = Report.config[]; (cfg === nothing) && error("No report config")
+  fname = "$(safe_name(name)).png"
+  path = joinpath(cfg.asset_path, fname); mkpath(dirname(path))
+
+  mod = nameof(parentmodule(typeof(obj)))
+  if mod == :Plots
+    getfield(parentmodule(typeof(obj)), :savefig)(obj, path)
+  elseif mod in (:Makie, :GLMakie, :CairoMakie, :WGLMakie)
+    getfield(parentmodule(typeof(obj)), :save)(path, obj)
+  elseif obj isa AbstractString
+    open(path, "w") do io; write(io, obj) end
+  else
+    error("Unsupported asset type: $(typeof(obj))")
+  end
+
+  url_path = (cfg.asset_url_path === nothing || isempty(cfg.asset_url_path)) ? fname : "$(cfg.asset_url_path)/$fname"
+  report("![$name]($url_path)"; clear=clear)
+  path
 end
 
 end
