@@ -16,7 +16,7 @@ Profit hunting experiments and explorations.
 
 [Extreme Value Theory, Heavy Tails](option_norm)
 
-![POT $(ename) 25-75 IQR](evt/pot-mle-25-75-iqr.png)
+![POT $(ename) 25-75 IQR](evt/readme/pot-mle-25-75-iqr.png)
 
 ### TODO
 
