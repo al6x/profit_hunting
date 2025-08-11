@@ -1,9 +1,13 @@
-show_plots = false
+show_plots = true
 
-function plot_xyc_by(title, ds; x, y, y2=nothing, c, by, ydomain=nothing, palette="coolwarm")
+function plot_xyc_by(
+  title, ds; x, y, y2=nothing, c, by, xdomain=nothing, ydomain=nothing, palette="coolwarm", xscale="linear", yscale="linear",
+  pointsize=3
+)
   py"""
   show_plots = $(show_plots)
-  title, ydomain, palette = $(title), $(ydomain), $(palette)
+  markersize = $(pointsize)
+  title, xdomain, ydomain, palette, xscale, yscale = $(title), $(xdomain), $(ydomain), $(palette), $(xscale), $(yscale)
   by, x, y, y2, color = $(by), $(x), $(y), $(y2), $(c)
   df = $(to_dict(ds))
 
@@ -37,11 +41,24 @@ function plot_xyc_by(title, ds; x, y, y2=nothing, c, by, ydomain=nothing, palett
     for lvl in sorted(df[color].unique()):
       grp = sub[sub[color] == lvl]
       if grp.empty: continue
-      ax.plot(grp[x], grp[y], linestyle='-', marker='o', color=palette_colors[lvl], label=lvl, alpha=0.7, markersize=3, linewidth=2)
-      if y2 is not None: ax.plot(grp[x], grp[y2], linestyle='--', marker='o', color=palette_colors[lvl], markersize=3, linewidth=1)
+      ax.plot(
+        grp[x], grp[y], linestyle='-', marker='o', color=palette_colors[lvl], label=lvl, alpha=0.7,
+        markersize=markersize, linewidth=2
+      )
+      if y2 is not None:
+        ax.plot(grp[x], grp[y2], linestyle='--', marker='o', color=palette_colors[lvl],
+          markersize=markersize, linewidth=1)
     ax.set_title(per); ax.set_xlabel(''); ax.set_ylabel('')
-    # ax.set_yscale('log')
-    if ydomain: ax.set_ylim(bottom=ydomain[0] if ydomain[0] is not None else ax.get_ylim()[0], top=ydomain[1] if ydomain[1] is not None else ax.get_ylim()[1])
+    if xscale == "log": ax.set_xscale('log')
+    if yscale == "log": ax.set_yscale('log')
+    if xdomain: ax.set_xlim(
+      left=xdomain[0] if xdomain[0] is not None else ax.get_xlim()[0],
+      right=xdomain[1] if xdomain[1] is not None else ax.get_xlim()[1]
+    )
+    if ydomain: ax.set_ylim(
+      bottom=ydomain[0] if ydomain[0] is not None else ax.get_ylim()[0],
+      top=ydomain[1] if ydomain[1] is not None else ax.get_ylim()[1]
+    )
 
   for ax in axes.flat[len(periods):]: fig.delaxes(ax)  # remove empty plots
   handles, labels = axes.flat[0].get_legend_handles_labels()
@@ -53,11 +70,11 @@ function plot_xyc_by(title, ds; x, y, y2=nothing, c, by, ydomain=nothing, palett
   """
 end
 
-function plot_by_vol_by_rf(title, ds_vol, ds_rf; ylabel, solid_label, ydomain, y, y2=nothing)
+function plot_by_vol_by_rf(title, ds_vol, ds_rf; ylabel, solid_label, ydomain=nothing, y, y2=nothing, xscale=nothing, yscale=nothing)
   show_plotsv = show_plots
   py"""
   show_plots = $(show_plotsv)
-  title, ylabel, solid_label, ydomain = $(title), $(ylabel), $(solid_label), $(ydomain)
+  title, ylabel, solid_label, ydomain, xscale, yscale = $(title), $(ylabel), $(solid_label), $(ydomain), $(xscale), $(yscale)
   y, y2 = $(y), $(y2)
   df_vol, df_rf = $(to_dict(ds_vol)), $(to_dict(ds_rf))
 
@@ -67,66 +84,68 @@ function plot_by_vol_by_rf(title, ds_vol, ds_rf; ylabel, solid_label, ydomain, y
   import math
   from lib.helpers import save_asset
 
-  try:
-    plot_mmean
-  except NameError:
-    def plot_mmean(title, yname, gname, ylabel, ydomain, clabel, mmeans, scale='linear', ax=None, y2name=None):
-      if not isinstance(mmeans, pd.DataFrame): mmeans = pd.DataFrame(mmeans)
+  # try:
+  #   plot_mmean
+  # except NameError:
+  def plot_mmean(title, yname, gname, ylabel, ydomain, clabel, mmeans, xscale, yscale, ax=None, y2name=None):
+    if not isinstance(mmeans, pd.DataFrame): mmeans = pd.DataFrame(mmeans)
 
-      groups = sorted(mmeans[gname].unique())
-      cmap = plt.get_cmap('coolwarm')
-      colors = cmap(np.linspace(0, 1, len(groups)))
+    groups = sorted(mmeans[gname].unique())
+    cmap = plt.get_cmap('coolwarm')
+    colors = cmap(np.linspace(0, 1, len(groups)))
 
-      ax.set_xlabel('Period')
-      ax.set_ylabel(ylabel)
-      ax.set_title(title, fontsize=10)
+    ax.set_xlabel('Period')
+    ax.set_ylabel(ylabel)
+    ax.set_title(title, fontsize=10)
+    if xscale == 'log':
       ax.set_xscale('log')
+    if ydomain is not None:
       ax.set_ylim(ydomain[0], ydomain[1])
 
-      if scale == 'log':
-        ax.set_yscale('log')
+    if yscale == 'log':
+      ax.set_yscale('log')
 
-      for i, v in enumerate(groups):
-        sub = mmeans[mmeans[gname] == v].sort_values('period')
-        x, y = sub['period'], sub[yname]
-        ax.scatter(x, y, color=colors[i], s=20, alpha=0.7, lw=0.2, label=f'{v}')
-        ax.plot(x, y, linestyle='--', color=colors[i], alpha=0.7, lw=1)
-        if y2name:
-          ax.plot(x, sub[y2name], color=colors[i], lw=2)
+    for i, v in enumerate(groups):
+      sub = mmeans[mmeans[gname] == v].sort_values('period')
+      x, y = sub['period'], sub[yname]
+      ax.scatter(x, y, color=colors[i], s=20, alpha=0.7, lw=0.2, label=f'{v}')
+      ax.plot(x, y, linestyle='-', marker='o', color=colors[i], alpha=0.7, markersize=3, linewidth=2)
+      if y2name:
+        ax.plot(x, sub[y2name], linestyle='--', marker='o', color=colors[i], markersize=3, linewidth=1)
 
-      ax.grid(True, which='both', ls=':')
-      ax.legend(title=clabel, fontsize='xx-small', loc='upper right')
+    ax.grid(True, which='both', ls=':')
+    ax.legend(title=clabel, fontsize='xx-small', loc='upper right')
 
-    def plot_grid(title, axes, ncols=2, figsize=(12, 8), show=True):
-      n_axes = len(axes)
-      nrows = (n_axes + ncols - 1) // ncols  # ceiling division to fit all axes
+  def plot_grid(title, axes, ncols=2, figsize=(12, 8), show=True):
+    n_axes = len(axes)
+    nrows = (n_axes + ncols - 1) // ncols  # ceiling division to fit all axes
 
-      fig, grid_axes = plt.subplots(nrows, ncols, figsize=figsize)
-      grid_axes = grid_axes.flatten()
+    fig, grid_axes = plt.subplots(nrows, ncols, figsize=figsize)
+    grid_axes = grid_axes.flatten()
 
-      for i, cb in enumerate(axes):
-        if i < len(grid_axes):
-          cb(grid_axes[i])  # call lambda with grid Axes
-        else:
-          fig.delaxes(grid_axes[i])  # remove unused axes if any
+    for i, cb in enumerate(axes):
+      if i < len(grid_axes):
+        cb(grid_axes[i])  # call lambda with grid Axes
+      else:
+        fig.delaxes(grid_axes[i])  # remove unused axes if any
 
-      fig.suptitle(title)
-      # plt.tight_layout(rect=[0, 0, 1, 0.95])
-      plt.tight_layout()
+    fig.suptitle(title)
+    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.tight_layout()
 
-      if show: plt.show()
-      save_asset(fig, title, clear=False)
-      plt.close(fig)
+    if show: plt.show()
+    save_asset(fig, title, clear=False)
+    plt.close(fig)
 
   plot_grid(f"{title} by (T, vol) and (T, rf), (solid - {solid_label})", [
     lambda ax: plot_mmean(
       title=f"{ylabel} by vol",
-      ax=ax, ydomain=ydomain, mmeans=df_vol, yname=y, y2name=y2, gname="volg", ylabel=ylabel,
+      ax=ax, ydomain=ydomain, mmeans=df_vol, yname=y, y2name=y2, gname="volg", ylabel=ylabel, xscale=xscale, yscale=yscale,
       clabel='Vol Group',
     ),
     lambda ax: plot_mmean(
       title=f"{ylabel} by RF",
-      ax=ax, ydomain=ydomain, mmeans=df_rf, yname=y, y2name=y2, gname="rfg", ylabel=ylabel,
+      ax=ax, ydomain=ydomain, mmeans=df_rf, yname=y, y2name=y2, gname="rfg", ylabel=ylabel, xscale=xscale, yscale=yscale,
       clabel='RF Group'
     )
   ], show=show_plots)

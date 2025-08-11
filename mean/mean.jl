@@ -5,25 +5,25 @@ denorm_mean(nmmean, period) = exp.(nmmean * period / 365)
 empir_mmean(lrs) = mean(exp.(lrs))
 
 function c_explore_mmean(ds_trunc, ds_orig)
-  ops = (
-    mean  = (g) -> empir_mmean(g.lr),
-    nmean = (g) -> norm_mean(empir_mmean(g.lr), g.period[1])
-  )
+  calc(ds) = begin
+    mean = empir_mmean(ds.lr)
+    (; mean, nmean=norm_mean(mean, ds.period[1]))
+  end
 
-  means_vol_rf = group_by_vol_rf(ds_orig, ops; volg=:volg, rfg=:rfg)
-  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, ops; volg=:volg, rfg=:rfg)
+  means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg=:rfg)
+  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg=:rfg)
   means_vol_rf.adjusted = means_vol_rf_trunc.mean
   means_vol_rf.nadjusted = means_vol_rf_trunc.nmean
   means_vol_rf.original = means_vol_rf.mean
   means_vol_rf.noriginal = means_vol_rf.nmean
 
-  means_vol = group_by_vol(ds_orig, ops; volg=:vol_dc)
-  means_vol_trunc = group_by_vol(ds_trunc, ops; volg=:vol_dc)
+  means_vol = group_by_vol(ds_orig, calc; volg=:vol_dc)
+  means_vol_trunc = group_by_vol(ds_trunc, calc; volg=:vol_dc)
   means_vol.mean2  = means_vol_trunc.mean
   means_vol.nmean2 = means_vol_trunc.nmean
 
-  means_rf  = group_by_rf(ds_orig, ops; rfg=:rfg)
-  means_rf_trunc  = group_by_rf(ds_trunc, ops; rfg=:rfg)
+  means_rf  = group_by_rf(ds_orig, calc; rfg=:rfg)
+  means_rf_trunc  = group_by_rf(ds_trunc, calc; rfg=:rfg)
   means_rf.mean2   = means_rf_trunc.mean
   means_rf.nmean2  = means_rf_trunc.nmean
 
@@ -62,25 +62,25 @@ function c_explore_mmean(ds_trunc, ds_orig)
 end
 
 function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
-  ops = (
-    mean  = (g) -> mean(g.lr),
-    nmean = (g) -> mean(g.lr) * (365 / g.period[1])
-  )
+  calc(ds) = begin
+    mean = mean(ds.lr)
+    (; mean, nmean=mean*(365 / ds.period[1]))
+  end
 
-  means_vol_rf = group_by_vol_rf(ds_orig, ops; volg=:volg, rfg)
-  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, ops; volg=:volg, rfg)
+  means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg)
+  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg)
   means_vol_rf.adjusted = means_vol_rf_trunc.mean ./ (means_vol_rf.vol/0.015)
   means_vol_rf.nadjusted = means_vol_rf_trunc.nmean ./ (means_vol_rf.vol/0.015)
   means_vol_rf.original = means_vol_rf.mean
   means_vol_rf.noriginal = means_vol_rf.nmean
 
-  means_vol = group_by_vol(ds_orig, ops; volg=:vol_dc)
-  means_vol_trunc = group_by_vol(ds_trunc, ops; volg=:vol_dc)
+  means_vol = group_by_vol(ds_orig, calc; volg=:vol_dc)
+  means_vol_trunc = group_by_vol(ds_trunc, calc; volg=:vol_dc)
   means_vol.mean2  = means_vol_trunc.mean
   means_vol.nmean2 = means_vol_trunc.nmean
 
-  means_rf  = group_by_rf(ds_orig, ops; rfg)
-  means_rf_trunc  = group_by_rf(ds_trunc, ops; rfg)
+  means_rf  = group_by_rf(ds_orig, calc; rfg)
+  means_rf_trunc  = group_by_rf(ds_trunc, calc; rfg)
   means_rf.mean2   = means_rf_trunc.mean
   means_rf.nmean2  = means_rf_trunc.nmean
 

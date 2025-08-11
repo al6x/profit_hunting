@@ -14,43 +14,56 @@ begin
   """
 end
 
-function group_by_vol_rf(ds, ops; volg=:vol_dc, rfg=:rfg)
+function spread(nt::NamedTuple)
+  n = nothing
+  for v in values(nt)
+    v isa AbstractArray || continue
+    n === nothing && (n = length(v); continue)
+    length(v) == n || error("Mismatched lengths among vector fields.")
+  end
+  n === nothing && return nt  # No composite fields, return as-is
+  (; (k => (v isa AbstractArray ? v : fill(v, n)) for (k, v) in pairs(nt))...)
+end
+
+function group_by_vol_rf(ds, op; volg=:vol_dc, rfg=:rfg)
   volg_medians = Dict(g[!, volg][1] => median(g.vol) for g in groupby(ds, volg))
   rfg_medians = Dict(g[!, rfg][1] => median(g.lr_rf) for g in groupby(ds, rfg))
 
   rows = combine(groupby(ds, [:period, volg, rfg])) do g
     period, volg_v, rfg_v = g.period[1], g[!, volg][1], g[!, rfg][1]
     vol, lr_rf = volg_medians[volg_v], rfg_medians[rfg_v]
-    results = (; (k => op(g) for (k, op) in pairs(ops))...)
-    merge((; period, volg=volg_v, rfg=rfg_v, vol, lr_rf), results)
+    # results = (; (k => op(g) for (k, op) in pairs(ops))...)
+    results = op(g)
+    spread(merge((; period, volg=volg_v, rfg=rfg_v, vol, lr_rf), results))
   end
 
   DataFrame(rows)
 end
 
-function group_by_vol(ds, ops; volg=:vol_dc)
+function group_by_vol(ds, op; volg=:vol_dc)
   lr_rf_median = median(ds.lr_rf)
 
   rows = combine(groupby(ds, [:period, volg])) do g
     period, volg_v = g.period[1], g[!, volg][1]
     vol, lr_rf  = median(g.vol), lr_rf_median
-    results = (; (k => op(g) for (k, op) in pairs(ops))...)
-    merge((; period, volg=volg_v, vol, lr_rf), results)
+    results = op(g)
+    spread(merge((; period, volg=volg_v, vol, lr_rf), results))
   end
 
   DataFrame(rows)
 end
 
-function group_by_rf(ds, ops; rfg=:rfg)
+function group_by_rf(ds, op; rfg=:rfg)
   vol_median = median(ds.vol)
 
   rows = combine(groupby(ds, [:period, rfg])) do g
     period, rfg_v = g.period[1], g[!, rfg][1]
     vol, lr_rf = vol_median, median(g.lr_rf)
-    results = (; (k => op(g) for (k, op) in pairs(ops))...)
+    # results = (; (k => op(g) for (k, op) in pairs(ops))...)
+    results = op(g)
     # mmean  = empir_mmean(g.lr)
     # mmean2 = isnothing(model) ? nothing : mean(model.(Ref(period), g.vol, g.lr_rf))
-    merge((; period, rfg=rfg_v, vol, lr_rf), results)
+    spread(merge((; period, rfg=rfg_v, vol, lr_rf), results))
   end
 
   DataFrame(rows)

@@ -1,66 +1,88 @@
-using Random, Statistics, StatsBase, Optim, Plots, Distributions, Extremes
+using Random, Statistics, StatsBase, Optim, Plots, Distributions
 
 includet.(["../lib/Lib.jl", "../lib/Report.jl"])
 using .Lib, .Report
 
 includet.("./plots.jl")
 
-Report.configure!(report_path="evt/readme.md", asset_path="evt/readme", asset_url_path="readme")
-Random.seed!(0)
+Report.configure!(report_path="evt/readme.md", asset_path="evt/readme", asset_url_path="readme");
+Random.seed!(0);
 
 report("""
-  Measuring the precision of EVT Peak Over Threshold (POT) method.
+  Correcting bias in EVT Peak Over Threshold (POT)
 
-  **Result**: out of the box it's no good at all, both bias and variance are high. It systematically underestimates the tail power ν, and very fragile slightest change in the treshold or sample produces wildly different results.
+  **Problem**: POT is biased, it fails to estimate `StudenT(ν=4)` even on large 50k samples. Systematically
+  underestimating the tail power ν.
+
+  **Solution**: Use use weighted MLE estimator with higher weights on underestimated points to correct the bias.
 
   # Experiment
 
-  Use 100 trials of `StudentT(ν=4)` samples 20k size to estimate the tail power ν using the Peak Over Threshold (POT) method.
+  Data: 100 trials of `StudentT(ν=4)`, each 20k sample.
 
-  Each sample estimated for various treshold quantile `q ∈ [0.95, 0.995]`.
+  Various treshold quantiles `q ∈ [0.95, 0.995]` used to estimate the tail exponent, and for each quantile bias and
+  variance calculated across 100 trials. The quantile used instead of explicit treshold to make estimation
+  independent of the sample size.
 
-  Only plots for MLE and Weighted Moments estimators shown, I also tested Bayesian it's no better.
+  Then same repeated for "Weighted MLE" estimator, which boosts the weights of underestimated points.
+
+  Only results for POT MLE estimator shown, there are also Weighted Moments and Bayesian estimators, I tested it, they
+  are no better than MLE, same results.
 
   Run `julia evt/evt.jl`.
 """; print=false)
 
-ν_true = 4
+fit_gpd_mle(x; xi_min=1/8, xi_max=1/2.5, weights=nothing) = begin
+  @assert all(x .>= 0) "Exceedances must be ≥ 0"
+  n = length(x); @assert n > 0 "Empty data"
 
-estimate_ν_mle(x) = 1/shape(gpfit(x))[1]
-estimate_ν_wm(x)  = 1/shape(gpfitpwm(x))[1]
-estimate_ν_bs(x)  = 1/shape(gpfitbayes(x))[1]
+  nll(θ) = begin
+    σ, ξ = θ
+    (σ <= 0 || ξ < xi_min || ξ > xi_max) && return Inf
+    d = GeneralizedPareto(0, σ, ξ)
+    llhs = logpdf.(d, x)
+    weights === nothing ? -sum(llhs) : -sum(weights .* llhs)
+  end
 
-estimate_ν(x; qs, estimate) = [begin
+  ξ0 = (xi_min + xi_max)/2
+  σ0 = max(mean(x) * (1 - ξ0), eps())
+
+  res = Optim.optimize(nll, [σ0, ξ0], Optim.BFGS(); autodiff = :forward)
+  σ, ξ = Optim.converged(res) ? Optim.minimizer(res) : error("Can't estimate GPD MLE")
+  GeneralizedPareto(0, σ, ξ)
+end;
+
+function fit_gpd_mle_weighted(x; n_tail, boost_underestimated_tail)
+  x = sort(x); n = length(x)
+  d0 = fit_gpd_mle(x)
+
+  tail_idx = (n-n_tail+1):n
+  S_emp = (n_tail:-1:1) ./ (n_tail + 1)
+  S_mod = 1 .- cdf.(d0, x[tail_idx])
+  underestimated_idx = tail_idx[S_emp .> S_mod]
+  underestimated_n = length(underestimated_idx)
+
+  weights = zeros(n) .+ 1/n
+  if underestimated_n > 0
+    weights[underestimated_idx] .*= boost_underestimated_tail
+  end
+  weights ./= sum(weights)
+  fit_gpd_mle(x; weights=weights)
+end;
+
+estimate_q(x, q, estimate) = begin
   u = quantile(x, q)
-  y = x[x .> u] .- u
-  clamp(estimate(y), 2.5, 10)
-end for q in qs]
+  y = (x[x .> u] .- u) ./ u
+  y, estimate(y)
+end;
 
-qs = range(0.95, 0.995, length = 50)
-
-c_spagetti(ename, estimate) = begin
-  n_trials = 10
-  νs = [begin
-    x = rand(TDist(ν_true), 20_000)
-    estimate_ν(x, qs=qs, estimate=estimate)
-  end for _ in 1:n_trials]
+c_spagetti(ename, trials, estimate, ν_true) = begin
+  νs = [last.(estimate_q.(Ref(x), qs, Ref(estimate))) for x in trials]
   plot_spagetti("POT $(ename) Spagetti"; ν_true=ν_true, qs=qs, νs=νs)
-end
+end;
 
-report("""
-# Spagetti Plot
-
-Each line is separate trial.
-""")
-c_spagetti("MLE", estimate_ν_mle)
-c_spagetti("WM", estimate_ν_wm)
-
-c_interval(ename, estimate) = begin
-  n_trials = 100
-  νs = [begin
-    x = rand(TDist(ν_true), 20_000)
-    estimate_ν(x, qs=qs, estimate=estimate)
-  end for _ in 1:n_trials]
+c_interval(ename, trials, estimate, ν_true) = begin
+  νs = [last.(estimate_q.(Ref(x), qs, Ref(estimate))) for x in trials]
 
   nqs = length(qs)
   vals = t -> getindex.(νs, t)
@@ -95,11 +117,49 @@ c_interval(ename, estimate) = begin
   save_asset("POT $(ename) Bias-Variance", plt)
 end
 
+c_log_log(ename, trials, q, estimate) = begin
+  ys, ds = Lib.unzip([estimate_q(x, q, estimate) for x in trials])
+  plot_cdfs("LogLog $(ename)", ys, ds)
+end
+
+# Run ----------------------------------------------------------------------------------------------
+ν_true = 4
+qs = range(0.97, 0.995, length = 50);
+trials = [rand(TDist(ν_true), 20_000) for _ in 1:100];
+
 report("""
-# Bias-Variance
+  # Spagetti Plot
+
+  Visual assessment of 10 trials with various quantile tresholds, each trial is a separate line.
 """)
 
-c_interval("MLE", estimate_ν_mle)
-c_interval("WM", estimate_ν_mle)
+c_spagetti("MLE", trials[1:10], (x) -> 1/fit_gpd_mle(x).ξ, ν_true);
+c_spagetti("Weighted MLE", trials[1:10], ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=10, boost_underestimated_tail=1.4).ξ), ν_true);
 
-a=1
+report("""
+  # Bias-Variance
+
+  Inter quartile range (IQR) of the tail exponent ν across 100 trials for various quantile tresholds.
+""")
+
+c_interval("MLE", trials, ((x) -> 1/fit_gpd_mle(x).ξ), ν_true)
+c_interval("Weighted MLE", trials, ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4).ξ), ν_true);
+
+best_q = 0.985
+report("""
+  # Log Log Plots
+
+  Visual assessment of 9 trials with optimal quantile = $(best_q).
+""")
+
+c_log_log("MLE", trials[1:9], best_q, fit_gpd_mle);
+c_log_log("Weighted MLE", trials[1:9], best_q, (x) -> fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4));
+
+report("""
+  # Checking if Weighted MLE also works for other ν = 3, 6
+""")
+
+for ν_true in [3, 6]
+  trials = [rand(TDist(ν_true), 20_000) for _ in 1:100];
+  c_interval("Weighted MLE ν=$(ν_true)", trials, ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4).ξ), ν_true);
+end

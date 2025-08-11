@@ -5,3 +5,4 @@ build
 bun.lockb
 __pycache__
 tmp.md
+.vscode
