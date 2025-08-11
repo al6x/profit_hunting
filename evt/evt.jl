@@ -6,7 +6,7 @@ using .Lib, .Report
 includet.("./plots.jl")
 
 Report.configure!(report_path="evt/readme.md", asset_path="evt/readme", asset_url_path="readme");
-Random.seed!(0);
+Random.seed!(1);
 
 report("""
   Correcting bias in EVT Peak Over Threshold (POT)
@@ -23,8 +23,6 @@ report("""
   Various treshold quantiles `q ∈ [0.95, 0.995]` used to estimate the tail exponent, and for each quantile bias and
   variance calculated across 100 trials. The quantile used instead of explicit treshold to make estimation
   independent of the sample size.
-
-  Then same repeated for "Weighted MLE" estimator, which boosts the weights of underestimated points.
 
   Only results for POT MLE estimator shown, there are also Weighted Moments and Bayesian estimators, I tested it, they
   are no better than MLE, same results.
@@ -163,3 +161,5 @@ for ν_true in [3, 6]
   trials = [rand(TDist(ν_true), 20_000) for _ in 1:100];
   c_interval("Weighted MLE ν=$(ν_true)", trials, ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4).ξ), ν_true);
 end
+
+println("Done")
