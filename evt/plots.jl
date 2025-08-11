@@ -36,11 +36,15 @@ function plot_cdfs(title, xs, ds; cols::Int=3, xlims=(1e-3, 10), ylims=(1e-4, 1.
     any(x .<= 0) && error("x must be positive for log–log scale")
 
     px = (n:-1:1) ./ (n + 1)
-    pd = max.(eps(), 1 .- cdf.(ds[j], x))
+    # pd = max.(eps(), 1 .- cdf.(ds[j], x))
     annotation=(0.005, 1e-3, text("ν=$(round(1/ds[j].ξ, digits=1))"))
 
     plot!(plt, x, px; seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, label="", subplot=j, xlims, ylims, annotation)
-    plot!(plt, x, pd; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
+    # plot!(plt, x, pd; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
+
+    xm = LinRange(xlims[1], xlims[2], 400)
+    pm = max.(eps(), 1 .- cdf.(ds[j], xm))
+    plot!(plt, xm, pm; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
   end
 
   display(plt)
