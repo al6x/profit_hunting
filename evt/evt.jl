@@ -205,10 +205,12 @@ ssize = 20_000
 report("
   # Stability of DEDH-HILL across ν and sample size
 ")
-for ssize in [5000, 10000, 50000], ν_true in [1.5, 5]
-  report("Sample size=$(ssize), ν=$(ν_true), trials=$(length(trials)))")
-  trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
-  plot_interval("DEDH-HILL"; qs, trials, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
+for ssize in [5000, 10000, 20000, 50000]
+  report("**Sample size**=$(ssize)")
+  for ν_true in [1.5, 5]
+    trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
+    plot_interval("DEDH-HILL"; qs, trials, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
+  end
 end
 
 println("Done")
