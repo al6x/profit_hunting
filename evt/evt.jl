@@ -19,8 +19,8 @@ report("""
   **Problem**: POT is biased, it fails to estimate `ν` even on large 50k samples, systematically
   underestimating it.
 
-  **Solution**: the `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` estimator is better, with properly choosen
-  treshold quantile it has almost zero bias and smaller variance.
+  **Solution**: the `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` is better, with properly choosen
+  treshold quantile `q = 0.985` it has almost zero bias and smaller variance.
 
   # Experiment
 
