@@ -5,7 +5,7 @@ using .Lib, .Report
 
 includet.("./lib.jl")
 
-Report.configure!(report_path="evt/readme.md", asset_path="evt/readme", asset_url_path="readme");
+Report.configure!(report_path="evt/tail-estimator.md", asset_path="evt/tail-estimator", asset_url_path="tail-estimator");
 default(dpi=200, titlefontsize = 10, markerstrokewidth = 0, legend=false, markersize=2,
   plot_titlefontsize=10);
 Random.seed!(1);
