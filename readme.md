@@ -13,7 +13,7 @@
 
 [Estimating Heavy Tails, Extreme Value Theory](evt)
 
-![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=3, ssize=20000)](tail-estimator/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
+![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=3, ssize=20000)](evt/tail-estimator/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
 
 ### TODO
 
