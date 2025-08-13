@@ -74,6 +74,7 @@ function save_asset(name::AbstractString, obj; clear::Bool=true)
   end
 
   url_path = (cfg.asset_url_path === nothing || isempty(cfg.asset_url_path)) ? fname : "$(cfg.asset_url_path)/$fname"
+  report(name; clear=clear)
   report("![$name]($url_path)"; clear=clear)
   path
 end

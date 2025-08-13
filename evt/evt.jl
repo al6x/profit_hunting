@@ -1,148 +1,191 @@
-using Random, Statistics, StatsBase, Optim, Plots, Distributions
+using Random, Statistics, StatsBase, Optim, Plots, Distributions, Extremes
 
 includet.(["../lib/Lib.jl", "../lib/Report.jl"])
 using .Lib, .Report
 
-includet.("./plots.jl")
+includet.("./lib.jl")
 
 Report.configure!(report_path="evt/readme.md", asset_path="evt/readme", asset_url_path="readme");
+default(dpi=200, titlefontsize = 10, markerstrokewidth = 0, legend=false, markersize=2,
+  plot_titlefontsize=10);
 Random.seed!(1);
 
 report("""
-  Correcting bias in EVT Peak Over Threshold (POT)
+  Estimating Tail Exponent
 
-  **Problem**: POT is biased, it fails to estimate `StudenT(ν=4)` even on large 50k samples. Systematically
-  underestimating the tail power ν.
+  **Goal**: Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Real case - estimate tail
+  exponent of asymmetric distribution that has tails similar to `StudentT`.
 
-  **Solution**: Use use weighted MLE estimator with higher weights on underestimated points to correct the bias.
+  **Problem**: POT is biased, it fails to estimate `ν` even on large 50k samples, systematically
+  underestimating it.
+
+  **Solution**: the `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` estimator is better, with properly choosen
+  treshold quantile it has almost zero bias and smaller variance.
 
   # Experiment
 
-  Data: 100 trials of `StudentT(ν=4)`, each 20k sample.
+  Data: 100 trials of `StudentT(ν=const)`, 20k sample each.
 
-  Various treshold quantiles `q ∈ [0.95, 0.995]` used to estimate the tail exponent, and for each quantile bias and
-  variance calculated across 100 trials. The quantile used instead of explicit treshold to make estimation
-  independent of the sample size.
+  Various treshold quantiles `q ∈ [0.95, 0.995]` used to estimate the tail exponent. For each
+  quantile bias and variance calculated across trials.
 
-  Only results for POT MLE estimator shown, there are also Weighted Moments and Bayesian estimators, I tested it, they
-  are no better than MLE, same results.
+  The quantile used instead of explicit treshold to make estimation independent of the sample size.
+
+  **Notes:**
+
+  POT estimates full GPD, DEDH and HILL only the linear tail slope, so optimal quantile threshold
+  is different.
 
   Run `julia evt/evt.jl`.
-"""; print=false)
+""")
 
-fit_gpd_mle(x; xi_min=1/8, xi_max=1/2.5, weights=nothing) = begin
-  @assert all(x .>= 0) "Exceedances must be ≥ 0"
-  n = length(x); @assert n > 0 "Empty data"
+plot_cdf(x, d) = begin
+  x = sort(x); n = length(x); px = (n:-1:1) ./ (n + 1)
+  pd = max.(eps(), 1 .- cdf.(d, x))
 
-  nll(θ) = begin
-    σ, ξ = θ
-    (σ <= 0 || ξ < xi_min || ξ > xi_max) && return Inf
-    d = GeneralizedPareto(0, σ, ξ)
-    llhs = logpdf.(d, x)
-    weights === nothing ? -sum(llhs) : -sum(weights .* llhs)
+  annotation=(0.005, 1e-3, text("ν=$(round(1/d.ξ, digits=1))"))
+
+  p = plot(x, px; annotation, seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, ylims = (1e-4, 1))
+  plot!(p, x, pd; label="1 - CDF(model)", color=:red, lw=1)
+  display(p)
+end
+
+plot_spagetti(ename; qs, trials, fit, ν_true, ssize) = begin
+  νs = [last.(fit_q.(Ref(x), qs, Ref(fit))) for x in trials]
+  n = length(νs)
+  cols = [cgrad(:viridis)[t] for t in range(0, 1, length=n)]
+  title = "$(ename) Spagetti (ν=$(ν_true), ssize=$(ssize))"
+
+  yticks = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 10]
+  plt = plot(qs, νs[1];
+    seriestype = :scatter, color = cols[1],
+    xlab = "Quantile threshold", ylab = "ν", title,
+    yscale = :log10, ylims = (1, 10),
+    yticks = (yticks, string.(yticks))
+  )
+
+  plot!(qs, νs[1], color = cols[1], lw = 1.5, label = "")
+
+  for i in 2:n
+    plot!(qs, νs[i],
+    seriestype = :scatter, color = cols[i], label = "")
+    plot!(qs, νs[i], color = cols[i], lw = 1.0, label = "")
   end
 
-  ξ0 = (xi_min + xi_max)/2
-  σ0 = max(mean(x) * (1 - ξ0), eps())
-
-  res = Optim.optimize(nll, [σ0, ξ0], Optim.BFGS(); autodiff = :forward)
-  σ, ξ = Optim.converged(res) ? Optim.minimizer(res) : error("Can't estimate GPD MLE")
-  GeneralizedPareto(0, σ, ξ)
+  hline!([ν_true], color = :red, ls = :dash, label = "True ν = $ν_true")
+  display(plt)
+  save_asset(title, plt)
 end;
 
-function fit_gpd_mle_weighted(x; n_tail, boost_underestimated_tail)
-  x = sort(x); n = length(x)
-  d0 = fit_gpd_mle(x)
-
-  tail_idx = (n-n_tail+1):n
-  S_emp = (n_tail:-1:1) ./ (n_tail + 1)
-  S_mod = 1 .- cdf.(d0, x[tail_idx])
-  underestimated_idx = tail_idx[S_emp .> S_mod]
-  underestimated_n = length(underestimated_idx)
-
-  weights = zeros(n) .+ 1/n
-  if underestimated_n > 0
-    weights[underestimated_idx] .*= boost_underestimated_tail
-  end
-  weights ./= sum(weights)
-  fit_gpd_mle(x; weights=weights)
-end;
-
-estimate_q(x, q, estimate) = begin
-  u = quantile(x, q)
-  y = (x[x .> u] .- u) ./ u
-  y, estimate(y)
-end;
-
-c_spagetti(ename, trials, estimate, ν_true) = begin
-  νs = [last.(estimate_q.(Ref(x), qs, Ref(estimate))) for x in trials]
-  plot_spagetti("POT $(ename) Spagetti"; ν_true=ν_true, qs=qs, νs=νs)
-end;
-
-c_interval(ename, trials, estimate, ν_true) = begin
-  νs = [last.(estimate_q.(Ref(x), qs, Ref(estimate))) for x in trials]
+plot_interval(ename; qs, trials, fit, ν_true, ssize) = begin
+  νs = [last.(fit_q.(Ref(x), qs, Ref(fit))) for x in trials]
 
   nqs = length(qs)
-  vals = t -> getindex.(νs, t)
+  vals = qi -> getindex.(νs, qi)
 
-  # Means and std calculated in log space to compensate for the skewness of (2..4] vs [4..10)
-  means = [exp.(mean(log.(vals(t)))) for t=1:nqs]
-  stds  = [exp.(std(log.(vals(t))))  for t=1:nqs]
-  q25s  = [quantile(vals(t), 0.25)  for t=1:nqs]
-  q75s  = [quantile(vals(t), 0.75)  for t=1:nqs]
+  # IQR
+  medns = [median(vals(qi))         for qi=1:nqs]
+  q25s  = [quantile(vals(qi), 0.25) for qi=1:nqs]
+  q75s  = [quantile(vals(qi), 0.75) for qi=1:nqs]
 
-  # 25-75 IQR Plot
-  ptitle = "POT $(ename) 25-75 IQR"
+  # Relative Bias-Variance
+  lmeans = [mean(log.(vals(qi))) for qi=1:nqs]
+  lstdt  = [std(log.(vals(qi)))  for qi=1:nqs]
+  bvs    = exp.(sqrt.((lmeans .- log(ν_true)) .^ 2 .+ lstdt .^ 2))
+
+  # Plot
+  ptitle = "$(ename) 25-50-75 IQR and Rel Bias-Variance (ν=$(ν_true), ssize=$(ssize))"
+  yticks = [1, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 10]
   plt = plot(
-    qs, means; ribbon=(means .- q25s, q75s .- means), ylims = (2.5, 8),
+    qs, medns; ribbon=(medns .- q25s, q75s .- medns), ylims = (1, 10),
     title=ptitle, fillalpha=0.1, color=:blue, label="q25-q75",
     xlab="Quantile threshold", ylab="ν",
     yscale = :log10,
-    yticks = ([2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8], string.([2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8]))
+    yticks = (yticks, string.(yticks))
   )
-  plot!(qs, means, color=:blue, lw=2, label="Mean ν")
+  plot!(qs, medns, color=:blue, lw=2, label="Median ν")
   hline!([ν_true], color = :red, ls = :dash, label = "True ν = $ν_true")
+
+  # Add RMSE on right y-axis (gray line)
+  plot!(qs, bvs; color=:gray, lw=2, label="Bias-Variance RMSE")
+
   display(plt)
   save_asset(ptitle, plt)
-
-  # Bias-Variance Plot
-  ptitle = "POT $(ename) Bias-Variance √ bias^2 + std^2"
-  bvs = sqrt.((means .- ν_true).^2 .+ stds.^2)
-  plt = plot(qs, bvs, title=ptitle, label=nothing,
-    xlab="Quantile threshold", ylab = "Bias-Variance RMSE"
-  )
-  display(plt)
-  save_asset("POT $(ename) Bias-Variance", plt)
 end
 
-c_log_log(ename, trials, q, estimate) = begin
-  ys, ds = Lib.unzip([estimate_q(x, q, estimate) for x in trials])
-  plot_cdfs("LogLog $(ename)", ys, ds)
+plot_log_log(ename; trials, q, fit, ν_true, ssize) = begin
+  cols, xlims, ylims =3, (1e-3, 10), (1e-4, 1.0)
+  zs, ds = unzip([fit_q(x, q, fit) for x in trials])
+  title = "LogLog $(ename) q=$(q) (ν_true=$(ν_true), ssize=$(ssize))"
+
+  m = length(zs); @assert m == length(ds)
+  rows = ceil(Int, m / cols)
+
+  plt = plot(layout=(rows, cols), size=(420*cols, 320*rows), plot_title=title)
+  for j in 1:m
+    x = sort(zs[j]); n = length(x)
+    any(x .<= 0) && error("x must be positive for log–log scale")
+
+    px = (n:-1:1) ./ (n + 1)
+    # pd = max.(eps(), 1 .- cdf.(ds[j], x))
+    annotation=(0.005, 1e-3, text("ν=$(round(1/ds[j].ξ, digits=1))"))
+
+    plot!(plt, x, px; seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, label="", subplot=j, xlims, ylims, annotation)
+    # plot!(plt, x, pd; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
+
+    xm = LinRange(xlims[1], xlims[2], 400)
+    pm = max.(eps(), 1 .- cdf.(ds[j], xm))
+    plot!(plt, xm, pm; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
+  end
+
+  display(plt)
+  save_asset(title, plt)
 end
 
 # Run ----------------------------------------------------------------------------------------------
-ν_true = 4
-qs = range(0.97, 0.995, length = 50);
-trials = [rand(TDist(ν_true), 20_000) for _ in 1:100];
+qs = range(0.97, 0.995, length=50);
+
+
+# Estimators Comparison ----------------------------------------------------------------------------
+ν_true, ssize = 3, 20_000
+trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
 
 report("""
-  # Spagetti Plot
+  # Estimators comparision (ν=$(ν_true), sample size=$(ssize), trials = $(length(trials)))
 
-  Visual assessment of 10 trials with various quantile tresholds, each trial is a separate line.
+  IQR `25-50-75` and Relative Bias-Variance
+  `exp(sqrt((mean(log(ν)) - log(ν_true))^2 + std(log(ν))^2))`.
 """)
 
-c_spagetti("MLE", trials[1:10], (x) -> 1/fit_gpd_mle(x).ξ, ν_true);
-c_spagetti("Weighted MLE", trials[1:10], ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=10, boost_underestimated_tail=1.4).ξ), ν_true);
+plot_intervals(;trials, qs, ssize, ν_true) = begin
+  plot_interval("DEDH-HILL"; qs, trials, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
+  plot_interval("DEDH"; qs, trials, fit=(x -> 1/fit_gpd_dedh(x).ξ), ν_true, ssize);
+  plot_interval("HILL"; qs, trials, fit=(x -> 1/fit_gpd_hill(x).ξ), ν_true, ssize);
+  plot_interval("GPD MLE"; qs, trials, fit=(x -> 1/fit_gpd_mle(x).ξ), ν_true, ssize);
+  plot_interval("GPD WM"; qs, trials, fit=(x -> 1/fit_gpd_wm(x).ξ), ν_true, ssize);
+end
 
+plot_intervals(;trials, qs, ssize, ν_true);
+
+
+# Spagetti Plot ------------------------------------------------------------------------------------
+trials20 = trials[1:20]
 report("""
-  # Bias-Variance
+  # Spagetti Plot (ν=$(ν_true), sample size=$(ssize), trials = $(length(trials)))
 
-  Inter quartile range (IQR) of the tail exponent ν across 100 trials for various quantile tresholds.
+  Visual assessment of $(length(trials)) trials with various quantile tresholds, each trial is a
+  separate line.
 """)
 
-c_interval("MLE", trials, ((x) -> 1/fit_gpd_mle(x).ξ), ν_true)
-c_interval("Weighted MLE", trials, ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4).ξ), ν_true);
+plot_spagetti("DEDH-HILL"; qs, trials=trials20, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
+plot_spagetti("DEDH"; qs, trials=trials20, fit=(x -> 1/fit_gpd_dedh(x).ξ), ν_true, ssize);
+plot_spagetti("HILL"; qs, trials=trials20, fit=(x -> 1/fit_gpd_hill(x).ξ), ν_true, ssize);
+plot_spagetti("MLE"; qs, trials=trials20, fit=(x -> 1/fit_gpd_mle(x).ξ), ν_true, ssize);
+plot_spagetti("WM"; qs, trials=trials20, fit=(x -> 1/fit_gpd_wm(x).ξ), ν_true, ssize);
 
+
+# Log Log ------------------------------------------------------------------------------------------
+trials9 = trials[1:9]
 best_q = 0.985
 report("""
   # Log Log Plots
@@ -150,16 +193,22 @@ report("""
   Visual assessment of 9 trials with optimal quantile = $(best_q).
 """)
 
-c_log_log("MLE", trials[1:9], best_q, fit_gpd_mle);
-c_log_log("Weighted MLE", trials[1:9], best_q, (x) -> fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4));
+plot_log_log("DEDH-HILL"; q=best_q, trials=trials9, fit=fit_gpd_dedh_hill, ν_true, ssize);
+plot_log_log("DEDH"; q=best_q, trials=trials9, fit=fit_gpd_dedh, ν_true, ssize);
+plot_log_log("HILL"; q=best_q, trials=trials9, fit=fit_gpd_hill, ν_true, ssize);
+plot_log_log("MLE"; q=best_q, trials=trials9, fit=fit_gpd_mle, ν_true, ssize);
+plot_log_log("WM"; q=best_q, trials=trials9, fit=fit_gpd_wm, ν_true, ssize);
 
-report("""
-  # Checking if Weighted MLE also works for other ν = 3, 6
-""")
 
-for ν_true in [3, 6]
-  trials = [rand(TDist(ν_true), 20_000) for _ in 1:100];
-  c_interval("Weighted MLE ν=$(ν_true)", trials, ((x) -> 1/fit_gpd_mle_weighted(x, n_tail=7, boost_underestimated_tail=1.4).ξ), ν_true);
+# Varying ν ----------------------------------------------------------------------------------------
+ssize = 20_000
+report("
+  # Stability of DEDH-HILL across ν and sample size
+")
+for ssize in [5000, 10000, 50000], ν_true in [1.5, 5]
+  report("Sample size=$(ssize), ν=$(ν_true), trials=$(length(trials)))")
+  trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
+  plot_interval("DEDH-HILL"; qs, trials, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
 end
 
 println("Done")

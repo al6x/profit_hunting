@@ -27,8 +27,8 @@ function configure!(; show_round=4)
 end
 configure!()
 
-function Base.show(io::IO, f::Float64)
-  Printf.@printf(io, "%.*f", config[].show_round, f)
-end
+# function Base.show(io::IO, f::Float64)
+#   Printf.@printf(io, "%.*f", config[].show_round, f)
+# end
 
 end
