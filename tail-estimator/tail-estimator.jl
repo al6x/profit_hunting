@@ -5,7 +5,8 @@ using .Lib, .Report
 
 includet.("./lib.jl")
 
-Report.configure!(report_path="tail-estimator/readme.md", asset_path="tail-estimator/readme", asset_url_path="readme");
+Report.configure!(report_path="tail-estimator/readme.md", asset_path="tail-estimator/readme",
+  asset_url_path="readme");
 default(dpi=200, titlefontsize = 10, markerstrokewidth = 0, legend=false, markersize=2,
   plot_titlefontsize=10);
 Random.seed!(1);
@@ -45,7 +46,8 @@ plot_cdf(x, d) = begin
 
   annotation=(0.005, 1e-3, text("ν=$(round(1/d.ξ, digits=1))"))
 
-  p = plot(x, px; annotation, seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, ylims = (1e-4, 1))
+  p = plot(x, px; annotation, seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue,
+    ylims = (1e-4, 1))
   plot!(p, x, pd; label="1 - CDF(model)", color=:red, lw=1)
   display(p)
 end
@@ -130,7 +132,8 @@ plot_log_log(ename; trials, q, fit, ν_true, ssize) = begin
     # pd = max.(eps(), 1 .- cdf.(ds[j], x))
     annotation=(0.005, 1e-3, text("ν=$(round(1/ds[j].ξ, digits=1))"))
 
-    plot!(plt, x, px; seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, label="", subplot=j, xlims, ylims, annotation)
+    plot!(plt, x, px; seriestype=:scatter, xscale=:log10, yscale=:log10, color=:blue, label="",
+      subplot=j, xlims, ylims, annotation)
     # plot!(plt, x, pd; color=:red, lw=1, label="1 - CDF(model)", subplot=j)
 
     xm = LinRange(xlims[1], xlims[2], 400)

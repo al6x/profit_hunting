@@ -2,7 +2,7 @@ module Lib
 
 import Printf
 
-export dedent, configure!, unzip
+export dedent, configure!, unzip, flatten
 
 function dedent(s::AbstractString)
   lines = split(s, '\n')
@@ -18,6 +18,8 @@ function unzip(rows)
   n = length(rows[1])
   ntuple(j -> getindex.(rows, j), n)
 end
+
+flatten(v::AbstractVector{<:AbstractVector{T}}) where {T} = collect(Iterators.flatten(v))
 
 mutable struct LibConfig show_round::Int end
 const config = Ref{Union{LibConfig, Nothing}}(nothing)
