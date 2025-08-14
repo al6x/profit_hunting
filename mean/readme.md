@@ -4,83 +4,62 @@ Exploring the `{T, Vol, RF Rate, E[R]}` shape.
 
 Run `julia mean/mean.jl`.
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+### Exploring Mean E[R]
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+Simulated bankrupts added, details `../hist_data/readme.md`.
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+Vol deciles 9,10 are visibly distorted, suppressing mean to make it look visibly same as 1-8 deciles. Mean suppressed
+as `log(r)^k(period, vol_dc) for vol_dc in 9, 10`. It distorts the distribution shape, but ok for mean.
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+Limiting mean to once in 10y events. Truncating upper tail by 1/3650 quantile. Because of positive skewed heavy tails
+mean is very sensitive to positive rare events, large event once in 100 year event may influence mean. Strictly
+speaking the true mean should account for once in 100 y events, so our estimation is not true mean. The 10y treshold
+also looks to be good as it's has almost no effect on the observable mean.
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Mean E[R] by (T, vol) and (T, rf), (solid - adjusted)](readme/mean-e-r-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm E[R] by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-e-r-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Mean E[R] (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/mean-e-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Mean (365/period)log(E[R]) (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-mean-365-period-log-e-r-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Mean E[R] (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/mean-e-r-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
 
-![Tail P (x=nrtail, y=rp, c=volg, by period)](readme/tail-p-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Mean (365/period)log(E[R]) (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-mean-365-period-log-e-r-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
 
-![Right Tail (x=rtail, y=rp, c=volg, by period)](readme/right-tail-x-rtail-y-rp-c-volg-by-period.png)
+### Exploring Log Mean E[log R] with 5 rf groups
 
-![Right Tail, tq=0.05 (x=rtail, y=rp, c=volg, by period)](readme/right-tail-tq-0-05-x-rtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rfg by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-rfg-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Right Tail (tail_x/mean(tail_x), tq=0.05) (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-tail-x-mean-tail-x-tq-0-05-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)(E[log R]) rfg by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-rfg-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rfg (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-rfg-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)E[log R] rfg (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rfg-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rfg (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-rfg-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)E[log R] rfg (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rfg-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+### Exploring Log Mean E[log R] with 10 rf groups
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rf_dc by (T, vol) and (T, rf), (solid - adjusted)](readme/log-mean-e-log-r-rf-dc-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)(E[log R]) rf_dc by (T, vol) and (T, rf), (solid - adjusted)](readme/norm-log-mean-365-period-e-log-r-rf-dc-by-t-vol-and-t-rf-solid-adjusted.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rf_dc (x=lr_rf, y=adjusted, c=volg, dashed=original, by period)](readme/log-mean-e-log-r-rf-dc-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)E[log R] rf_dc (x=lr_rf, y=nadjusted, c=volg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rf-dc-x-lr-rf-y-nadjusted-c-volg-dashed-noriginal-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Log Mean E[log R] rf_dc (x=vol, y=adjusted, c=rfg, dashed=original, by period)](readme/log-mean-e-log-r-rf-dc-x-vol-y-adjusted-c-rfg-dashed-original-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+![Norm Log Mean (365/period)E[log R] rf_dc (x=vol, y=nadjusted, c=rfg, dashed=noriginal, by period)](readme/norm-log-mean-365-period-e-log-r-rf-dc-x-vol-y-nadjusted-c-rfg-dashed-noriginal-by-period.png)
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+### Data
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+Details `../hist_data/readme.md`.
 
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![nσ (x=lr_rf, y=nσ, c=volg, dashed=nσ_orig, by period)](readme/n-x-lr-rf-y-n-c-volg-dashed-n-orig-by-period.png)
-
-![ν (x=lr_rf, y=ν, c=volg, dashed=ν_orig, by period)](readme/x-lr-rf-y-c-volg-dashed-orig-by-period.png)
-
-![nσ (x=lr_rf, y=σ, c=volg, dashed=σ_orig, by period)](readme/n-x-lr-rf-y-c-volg-dashed-orig-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
-
-![Norm Right Tail (x=nrtail, y=rp, c=volg, by period)](readme/norm-right-tail-x-nrtail-y-rp-c-volg-by-period.png)
+    - volg - volatility group
+    - rfg - risk free rate group
 

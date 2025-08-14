@@ -6,8 +6,8 @@ empir_mmean(lrs) = mean(exp.(lrs))
 
 function c_explore_mmean(ds_trunc, ds_orig)
   calc(ds) = begin
-    mean = empir_mmean(ds.lr)
-    (; mean, nmean=norm_mean(mean, ds.period[1]))
+    m = empir_mmean(ds.lr)
+    (; mean=m, nmean=norm_mean(m, ds.period[1]))
   end
 
   means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg=:rfg)
@@ -63,8 +63,8 @@ end
 
 function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
   calc(ds) = begin
-    mean = mean(ds.lr)
-    (; mean, nmean=mean*(365 / ds.period[1]))
+    m = mean(ds.lr)
+    (; mean=m, nmean=m*(365 / ds.period[1]))
   end
 
   means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg)
@@ -164,3 +164,5 @@ Details `../hist_data/readme.md`.
   - volg - volatility group
   - rfg - risk free rate group
 """; print=false)
+
+println("Done.")

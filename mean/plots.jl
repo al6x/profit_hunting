@@ -1,4 +1,4 @@
-show_plots = true
+show_plots = false
 
 function plot_xyc_by(
   title, ds; x, y, y2=nothing, c, by, xdomain=nothing, ydomain=nothing, palette="coolwarm", xscale="linear", yscale="linear",

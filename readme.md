@@ -11,9 +11,9 @@
 
 ![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
-[Estimating Heavy Tails, Extreme Value Theory](evt)
+[Estimating Heavy Tails, Extreme Value Theory](tail-estimator)
 
-![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=3, ssize=20000)](evt/tail-estimator/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
+![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=3, ssize=20000)](tail-estimator/readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
 
 ### TODO
 
