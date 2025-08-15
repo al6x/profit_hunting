@@ -6,6 +6,7 @@ Data has both comission (large cap) and omission biases (no bankrupts).
 
     - period_d: Period days [30, 60, 91, 182, 365, 730, 1095]
     - t: start of the period, T_0, 'YYYY-MM-DD' format
+    - cohort: Cohort to avoid overlapping moving window, there's no overlap within each cohort.
 
     - lr_rf_1y_t: log(risk free return 1y at time T_0)
 

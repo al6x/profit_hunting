@@ -17,5 +17,6 @@
 
 ### TODO
 
+- left vs right tails exponent
 - option_norm: rescale mmean plot as `(365/period)E[R]`.
 - maybe add HoloViz https://panel.holoviz.org/reference/index.html (integrates with vscode and live update), streamlit, Pluto.jl
