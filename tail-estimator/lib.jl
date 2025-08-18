@@ -1,6 +1,12 @@
-fit_q(x, q, fit) = begin
+using Distributions
+
+gpd_tail(x, q) = begin
   u = quantile(x, q)
-  z = (x[x .> u] .- u) ./ u
+  (x[x .> u] .- u) ./ u
+end
+
+fit_q(x, q, fit) = begin
+  z = gpd_tail(x, q)
   z, fit(z)
 end
 

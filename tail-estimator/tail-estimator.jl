@@ -204,16 +204,16 @@ plot_log_log("WM"; q=best_q, trials=trials9, fit=fit_gpd_wm, ν_true, ssize);
 
 
 # Varying ν ----------------------------------------------------------------------------------------
-ssize = 20_000
-report("
-  # Stability of DEDH-HILL across ν and sample size
-")
-for ssize in [5000, 10000, 20000, 50000]
-  report("**Sample size**=$(ssize)")
-  for ν_true in [1.5, 5]
-    trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
-    plot_interval("DEDH-HILL"; qs, trials, fit=(x -> 1/fit_gpd_dedh_hill(x).ξ), ν_true, ssize);
+for (name, fit) in [("DEDH-HILL", fit_gpd_dedh_hill), ("DEDH", fit_gpd_dedh)]
+  report("
+    # Stability of $name across ν and sample size
+  ")
+  for ssize in [5_000, 10_000, 20_000, 50_000, 300_000]
+    report("**Sample size**=$(ssize)")
+    for ν_true in [1.5, 5]
+      trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
+      plot_interval(name; qs, trials, fit=(x -> 1/fit(x).ξ), ν_true, ssize);
+    end
   end
 end
-
 println("Done")

@@ -142,3 +142,66 @@ DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=50000)
 
 ![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=50000)](readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-50000.png)
 
+**Sample size**=300000
+
+DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=300000)
+
+![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=300000)](readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-300000.png)
+
+DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=300000)
+
+![DEDH-HILL 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=300000)](readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-300000.png)
+
+
+### Stability of DEDH across ν and sample size
+
+**Sample size**=5000
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=5000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=5000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-5000.png)
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=5000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=5000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-5000.png)
+
+**Sample size**=10000
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=10000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=10000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-10000.png)
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=10000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=10000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-10000.png)
+
+**Sample size**=20000
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=20000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=20000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-20000.png)
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=20000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=20000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-20000.png)
+
+**Sample size**=50000
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=50000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=50000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-50000.png)
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=50000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=50000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-50000.png)
+
+**Sample size**=300000
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=300000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=1.5, ssize=300000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-1-5-ssize-300000.png)
+
+DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=300000)
+
+![DEDH 25-50-75 IQR and Rel Bias-Variance (ν=5.0, ssize=300000)](readme/dedh-25-50-75-iqr-and-rel-bias-variance-5-0-ssize-300000.png)
+
