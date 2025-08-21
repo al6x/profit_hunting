@@ -6,7 +6,23 @@ Estimating tail exponent of stock log returns
 Most interesting periods are 1d and 30d. Larger periods >=60d have much less data and shown for
 comparison only.
 
-**Results**:
+**Results**: I think the most reliable estimation from normalised returns, estimates for raw
+return and returns grouped by volatility deciles are mostly for comparison.
+
+**1d**, right tail **ν=3.6**, left tail with synthetic bankrupts **ν=2.2**, left tail without
+bankrupts (the data is biased, no bankrupt distress delisting) **ν=3.2**. Maybe for the left
+tail something in between should be choosen, like **ν=2.5**, as we can't say for sure if
+synthetic bankrupts are correct approximation of real bankrupts or not.
+
+**30d**, right tail **ν=4.6**, left tail with synthetic bankrupts **ν=1.2**, left tail without
+bankrupts **ν=4.0**. I think it has same tails as 1d, because tail exponent resistant to
+aggregation, we observe less heavy tails for 30d because there's x30 less data. The left tail
+with synthetic bankrupts is unusually small, I guess because it's only approximation of real
+data with bankrupts, and it distort the estimator and should be ignored.
+
+**Larger periods >=60d** I think estimates for larger periods are wrong, because they have orders
+of magnitude less data, and so present for comparison only. I think they have same tail exponents
+as 1d, because tail exponent is resistant to aggregation.
 
 **Data**: Daily prices of 250 stocks all starting with 1972, [details](/hist_data)`.
 
@@ -43,7 +59,7 @@ step=period), each cohort shifts initial position by +30.
 
 **Run**: `julia tail/tail.jl`.
 
-### Bankrupts
+# Bankrupts
 
 The data has survivorship bias, no bankrupt delisted stocks. Left tail exponent estimated twice,
 on raw data and data with syntetic bankrupts added.
@@ -54,7 +70,7 @@ Left tail exponent with syntetic banrkupt should be treated only as very approxi
 probably someting in between of with and without bankrupts should be used.
 
 If you have access to **unbiased data**, please let me know I would be interested to analyse it
-to see results, for free.
+and see results.
 
 ### Estimating tail of raw log returns
 
@@ -402,6 +418,73 @@ Right Tail by Vol table
   38 │     60       1       8     118      7.4
   39 │     60       1       9     119      4.5
   40 │     60       1      10     119      7.2
+```
+
+Left Tail by Vol x=survx, y=survycolor=vol_dc(cohort), dashed=survy_m by=period
+
+![Left Tail by Vol x=survx, y=survycolor=vol_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-vol-x-survx-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
+
+Left Tail by Vol Norm x=survxn, y=survycolor=vol_dc(cohort), dashed=survy_m by=period
+
+![Left Tail by Vol Norm x=survxn, y=survycolor=vol_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-vol-norm-x-survxn-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
+
+Left Tail by Vol table
+
+```
+3×2 DataFrame
+ Row │ period  ν
+     │ Int64   Float64
+─────┼─────────────────
+   1 │      1      3.3
+   2 │     30      4.0
+   3 │     60      5.3
+```
+
+```
+40×5 DataFrame
+ Row │ period  cohort  vol_dc  tail_k  ν
+     │ Int64   Int64   Int64   Int64   Float64
+─────┼─────────────────────────────────────────
+   1 │      1       0       1     750      3.6
+   2 │      1       0       2    1460      2.9
+   3 │      1       0       3    1572      3.3
+   4 │      1       0       4    1553      3.4
+   5 │      1       0       5    1514      3.1
+   6 │      1       0       6    1534      3.2
+   7 │      1       0       7    1526      3.3
+   8 │      1       0       8    1531      3.3
+   9 │      1       0       9    1504      3.3
+  10 │      1       0      10    1408      3.5
+  11 │     30       0       1     234      3.4
+  12 │     30       0       2     235      3.9
+  13 │     30       0       3     235      4.1
+  14 │     30       0       4     235      3.9
+  15 │     30       0       5     234      3.3
+  16 │     30       0       6     236      4.8
+  17 │     30       0       7     233      3.9
+  18 │     30       0       8     236      5.2
+  19 │     30       0       9     232      6.8
+  20 │     30       0      10     231      6.8
+  21 │     60       0       1     118      3.1
+  22 │     60       0       2     120      6.5
+  23 │     60       0       3     118      3.7
+  24 │     60       0       4     118      6.8
+  25 │     60       0       5     118      4.2
+  26 │     60       0       6     118      6.7
+  27 │     60       0       7     117      5.0
+  28 │     60       0       8     119      7.1
+  29 │     60       0       9     118      6.9
+  30 │     60       0      10     115      6.9
+  31 │     60       1       1     118      3.6
+  32 │     60       1       2     116      3.4
+  33 │     60       1       3     119      3.7
+  34 │     60       1       4     119      6.5
+  35 │     60       1       5     117      4.8
+  36 │     60       1       6     118      3.7
+  37 │     60       1       7     118      6.9
+  38 │     60       1       8     118      7.1
+  39 │     60       1       9     119      5.5
+  40 │     60       1      10     118      4.1
 ```
 
 Left Tail by Vol x=survx, y=survycolor=vol_dc(cohort), dashed=survy_m by=period
