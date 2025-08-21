@@ -11,18 +11,18 @@ comparison only.
 I think normalised returns give the most reliable estimation. Estimates for raw
 return and returns grouped by volatility deciles are for comparison mostly.
 
-1d, right tail ν=3.6, left tail with synthetic bankrupts ν=2.2, left tail without
+1d: right tail ν=3.6, left tail with synthetic bankrupts ν=2.2, left tail without
 bankrupts (the data is biased, no bankrupt distress delisting) ν=3.2. Maybe for the left
 tail something in between should be choosen, like ν=2.5, as we can't say for sure if
 synthetic bankrupts are correct approximation of real bankrupts.
 
-30d, right tail ν=4.6, left tail with synthetic bankrupts ν=1.2, left tail without
+30d: right tail ν=4.6, left tail with synthetic bankrupts ν=1.2, left tail without
 bankrupts ν=4.0. I think it has same tails as 1d, because tail exponent resistant to
 aggregation, we observe less heavy tails for 30d because there's x30 less data. The left tail
 with synthetic bankrupts is unusually small, I guess because it's only approximation of real
 bankrupts, and it distort the estimator and should be ignored.
 
-Larger periods >=60d I think estimates for larger periods are wrong, because they have much
+Larger periods >=60d: I think estimates for larger periods are wrong, because they have much
 less data, and present for comparison only. I think they have same tail exponents
 as 1d, because tail exponent is resistant to aggregation.
 
