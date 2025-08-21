@@ -3,12 +3,14 @@ Estimating tail exponent of stock log returns
 **Goal**: Estimate left and right tails on 1d, 30d, 365d log returns, using Extreme Value Theory,
 [POT GPT DEDH-HILL method](/tail-estimator).
 
+Most interesting periods are 1d and 30d. Larger periods >=60d have much less data and shown for
+comparison only.
+
 **Results**:
 
 **Data**: Daily prices of 250 stocks all starting with 1972, [details](/hist_data)`.
 
-Most interesting are 1d and 30d returns. Calculated with moving window(size=30,
-step-30), without overlap.
+1d and 30d returns calculated with moving window(size=30, step-30).
 
 For larger periods >=60d, cacluation a bit more complex, using cohorts, you can ignore details
 and just consider it as multiple version of same returns, you will see it as multiple lines
@@ -55,6 +57,9 @@ If you have access to **unbiased data**, please let me know I would be intereste
 to see results, for free.
 
 ### Estimating tail of raw log returns
+
+1d and 30d are most interesting. Periods >=60d have much less data and show for visual comparison
+only. Multiple lines on >=60d periods are cohorts, ignore it.
 
 Right Tail x=survxn, y=survy(cohort), dashed=survy_m by=period
 

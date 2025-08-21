@@ -146,7 +146,7 @@ plot_log_log(ename; trials, q, fit, ν_true, ssize) = begin
 end
 
 # Run ----------------------------------------------------------------------------------------------
-qs = range(0.97, 0.999, length=200);
+qs = range(0.98, 0.999, length=200);
 
 
 # Estimators Comparison ----------------------------------------------------------------------------
@@ -204,15 +204,17 @@ plot_log_log("WM"; q=best_q, trials=trials9, fit=fit_gpd_wm, ν_true, ssize);
 
 
 # Varying ν ----------------------------------------------------------------------------------------
-for (name, fit) in [("DEDH-HILL", fit_gpd_dedh_hill), ("DEDH", fit_gpd_dedh)]
-  report("
-    # Stability of $name across ν and sample size
-  ")
-  for ssize in [5_000, 10_000, 20_000, 50_000, 300_000]
-    report("**Sample size**=$(ssize)")
-    for ν_true in [1.5, 5]
-      trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
-      plot_interval(name; qs, trials, fit=(x -> 1/fit(x).ξ), ν_true, ssize);
+let
+  for (name, fit) in [("DEDH-HILL", fit_gpd_dedh_hill), ("DEDH", fit_gpd_dedh)]
+    report("
+      # Stability of $name across ν and sample size
+    ")
+    for ssize in [5_000, 10_000, 20_000, 50_000, 300_000]
+      report("**Sample size**=$(ssize)")
+      for ν_true in [1.5, 5]
+        trials = [rand(TDist(ν_true), ssize) for _ in 1:100];
+        plot_interval(name; qs, trials, fit=(x -> 1/fit(x).ξ), ν_true, ssize);
+      end
     end
   end
 end

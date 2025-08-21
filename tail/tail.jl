@@ -43,8 +43,7 @@ report("""
 
   **Data**: Daily prices of 250 stocks all starting with 1972, [details](/hist_data)`.
 
-  Most interesting are 1d and 30d returns. Returns calculated with moving window(size=30,
-  step-30), without overlap.
+  1d and 30d returns calculated with moving window(size=30, step-30).
 
   For larger periods >=60d, cacluation a bit more complex, using cohorts, you can ignore details
   and just consider it as multiple version of same returns, you will see it as multiple lines
@@ -328,3 +327,5 @@ report("""
 
 c_tail_by_vol("Right Tail by Vol", calc_right_tail_by_vol)
 c_tail_by_vol("Left Tail by Vol", calc_left_tail_by_vol)
+
+println("Done")
