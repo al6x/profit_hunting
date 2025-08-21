@@ -29,21 +29,24 @@ Additional, pre computed fields
 
 # Bankrupts
 
+Any distress delisting, not just legal bankrupts.
+
 Data has omission bias - no bankrupts, adding bankrupts explicitly.
 
-The **annual bankruptsy probability** conditional on company volatility `P(b|σ,T=365)`. Defined as PMF for each
-quantile, derived from `logit P(b∣σ,T=365)=α+βσ, β~3-4 and α = total rate`. With total bankruptcy probability per
-year `P(b|T=365) = 0.5%`.
+Bankrupt **probabilities**:
 
-The **drop magnitude** is fixed as 0.1.
+- Whole market annual bankruptsy probability choosen as 2%.
+- Annual returns split into volatility deciles, bankrupt rate difference
+  between 1 and 10 deciles choosen as x20.
+- Probabilities in between calculated as `p(vol_dc) = exp a*vol_dc / normalisation` where
+  a choosen to match x20 ratio `a = log(20)/9`.
 
-For differrent period T probability adjusted as `P(b|T) = 1 - (1 - p_b)^(T / 365)`, the drop is the same, independent
-from T.
+Resulting table, annual bankruptsy probability by vol decile:
 
-All future returns of the stock after then bankruptcy dropped. If overlapping window used the bankruptcy probability
-for each symbol checked only once per period.
+```
+[0.29, 0.41, 0.57, 0.80, 1.11, 1.55, 2.16, 3.02, 4.21, 5.87]
+```
 
-To compensate declining data points per year because stocks are removed, the data points for each year resampled to
-make it even for every year.
+Bankrupt **magnitude** fixed as 0.1.
 
-To avoid losing valuable historial data after the bankruptcy event, the dataset is duplicated.
+Then syntetic bankrupts added, without accounting for absorbing barrier, as iid.

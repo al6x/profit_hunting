@@ -2,7 +2,18 @@ module Lib
 
 import Printf
 
-export dedent, configure!, unzip, flatten
+export dedent, configure!, unzip, flatten, spread
+
+function spread(nt::NamedTuple)
+  n = nothing
+  for v in values(nt)
+    v isa AbstractArray || continue
+    n === nothing && (n = length(v); continue)
+    length(v) == n || error("Mismatched lengths among vector fields.")
+  end
+  n === nothing && return nt  # No composite fields, return as-is
+  (; (k => (v isa AbstractArray ? v : fill(v, n)) for (k, v) in pairs(nt))...)
+end
 
 function dedent(s::AbstractString)
   lines = split(s, '\n')

@@ -3,24 +3,23 @@ import numpy as np
 
 # P(bankrupt(per year)|volatility decile)
 BANKRUPT_P = {
-  1  : 0.0011,
-  2  : 0.0013,
-  3  : 0.0016,
-  4  : 0.0019,
-  5  : 0.0022,
-  6  : 0.0026,
-  7  : 0.0038,
-  8  : 0.0053,
-  9  : 0.0090,
-  10 : 0.0212
+  1  : 0.00011,
+  2  : 0.00013,
+  3  : 0.00016,
+  4  : 0.00019,
+  5  : 0.00022,
+  6  : 0.00026,
+  7  : 0.00038,
+  8  : 0.00053,
+  9  : 0.00090,
+  10 : 0.00212
 }
 
 BANKRUPT_MR = 0.1 # mult return
 
 def add_bankrupts(df, period_d, fields):
   assert period_d == 1 or period_d >= 30
-  assert np.issubdtype(df['t'].dtype, np.datetime64)
-  df = df.copy().sort_values(['symbol','t']).reset_index(drop=True)
+  df = df.copy().reset_index(drop=True)
   df['bankrupt'] = False
 
   bankrupts = []

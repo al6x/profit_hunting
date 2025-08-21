@@ -2,7 +2,7 @@ module Report
 
 using ..Lib
 
-export configure!, report, save_asset
+export configure!, report, report_code, save_asset
 
 mutable struct ReportConfig report_path; asset_path; asset_url_path; first_call end
 
@@ -12,6 +12,11 @@ const config = Ref{Union{ReportConfig, Nothing}}(nothing)
 
 function configure!(; report_path, asset_path, asset_url_path::Union{AbstractString, Nothing}=nothing)
   config[] = ReportConfig(report_path, asset_path, asset_url_path, true)
+end
+
+report_code(code::AbstractString; lang=nothing, args...) = begin
+  lang_s = lang === nothing ? "" : " $lang"
+  report("```$lang_s\n$code\n```"; args...)
 end
 
 function report(msg::AbstractString; print=true, clear=true)
@@ -65,6 +70,8 @@ function save_asset(name::AbstractString, obj; clear::Bool=true)
   mod = nameof(parentmodule(typeof(obj)))
   if mod == :Plots
     getfield(parentmodule(typeof(obj)), :savefig)(obj, path)
+  elseif mod == :VegaLite
+    getfield(parentmodule(typeof(obj)), :save)(path, obj)
   elseif mod in (:Makie, :GLMakie, :CairoMakie, :WGLMakie)
     getfield(parentmodule(typeof(obj)), :save)(path, obj)
   elseif obj isa AbstractString

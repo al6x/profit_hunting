@@ -5,51 +5,23 @@ import numpy as np
 from hist_data.add_bankrupts import add_bankrupts
 
 def add_fields(df):
-  if 't' in df.columns:
+  if ('t' in df.columns) and ('period_d' in df.columns):
+    # Aggregated data for various periods
     df['t'] = pd.to_datetime(df['t'], format='%Y-%m-%d', errors='raise')
+    df['vol'] = df['scale_d_t']
+  else:
+    df['vol'] = np.abs(df['lr_t']) # abs(lr_t) as volatility
+    df['period_d'] = 1
+    df['cohort'] = 0
 
-  # Daily use abs(lr_t) as volatility
-  df['vol'] = df['scale_d_t'] if 't' in df.columns else np.abs(df['lr_t'])
-
-def assign_quantiles(df, cname, qname, dcname, dcmian):
+def assign_quantiles(df, cname, qname, dcname, dcmian=None):
   x = df[cname].values
   ranks = np.argsort(np.argsort(x))
   q = (ranks + 1) / len(x)
   df[qname] = q
-  df[dcname] = np.minimum((q * 10).astype(int) + 1, 10)
-  df[dcmian] = df.groupby(dcname)[cname].transform('median')
-
-def load(fname='hist_data/returns-periods.tsv.zip'):
-  df = pd.read_csv(fname, sep='\t', compression='zip')
-  add_fields(df)
-
-  cols = ['vol_q','vol_dc','vol_dc_mian']
-  for _, idx in df.groupby('period_d').groups.items():
-    sub = df.loc[idx].copy()
-    assign_quantiles(sub, 'vol', *cols)
-    df.loc[idx, cols] = sub[cols].to_numpy()
-
-  return df
-
-def load_with_bankrupts(fname='hist_data/returns-periods.tsv.zip'):
-  df_all = pd.read_csv(fname, sep='\t', compression='zip')
-  out, qcols = [], ['vol_q','vol_dc','vol_dc_mian']
-
-  for (period_d, cohort), idx in df_all.groupby(['period_d','cohort']).groups.items():
-    df = df_all.loc[idx].copy()
-
-    add_fields(df)
-    assign_quantiles(df, 'vol', *qcols)
-
-    df = add_bankrupts(df, period_d, ['lr_t2','lr_t2_min','lr_t2_max'])
-    df = make_each_year_have_even_counts_of_records(df)
-
-    add_fields(df)                                  # recompute with bankrupts included
-    assign_quantiles(df, 'vol', *qcols)
-
-    out.append(df)
-
-  return pd.concat(out, ignore_index=True)
+  df[dcname] = np.minimum((q * 10).astype(int) + 1, 10).astype(int)
+  if dcmian is not None:
+    df[dcmian] = df.groupby(dcname)[cname].transform('median')
 
 def make_each_year_have_even_counts_of_records(df):
   df = df.copy()
@@ -94,6 +66,36 @@ def make_each_year_have_even_counts_of_records(df):
   balanced = balanced.drop(columns='year')
 
   return balanced
+
+def load(fname='hist_data/returns-periods.tsv.zip'):
+  df = pd.read_csv(fname, sep='\t', compression='zip')
+  add_fields(df)
+
+  out = []
+  for _, idx in df.groupby('period_d').groups.items():
+    sub = df.loc[idx].copy()
+    assign_quantiles(sub, 'vol', 'vol_q', 'vol_dc', 'vol_dc_mian')
+    out.append(sub)
+  return pd.concat(out, ignore_index=True)
+
+def load_with_bankrupts(fname='hist_data/returns-periods.tsv.zip'):
+  df_all = pd.read_csv(fname, sep='\t', compression='zip')
+  add_fields(df_all)
+
+  out, qcols = [], ['vol_q','vol_dc','vol_dc_mian']
+  for (period_d, cohort), idx in df_all.groupby(['period_d','cohort']).groups.items():
+    df = df_all.loc[idx].copy()
+
+    assign_quantiles(df, 'vol', *qcols)
+    df = add_bankrupts(df, period_d, ['lr_t2','lr_t2_min','lr_t2_max'])
+    # df = make_each_year_have_even_counts_of_records(df)
+
+    # add_fields(df) # recompute with bankrupts included
+    # assign_quantiles(df, 'vol', *qcols)
+
+    out.append(df)
+
+  return pd.concat(out, ignore_index=True)
 
 # def adjust_data_mmean(df):
 #   # Description and charts in `/mean`
