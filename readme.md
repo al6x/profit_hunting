@@ -11,7 +11,7 @@
 
 ![Norm Premium P/E[R]/Scale[log R], Norm Strike P(R < K | vol)](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
-[Estimting tails for stock log returns, Extreme Value Theory](tail)
+[Estimting tails for stock returns, Extreme Value Theory](tail)
 
 ![Left Tail by Vol Norm x=survxn, y=survycolor=vol_dc(cohort), dashed=survy_m by=period](/tail/readme/left-tail-by-vol-norm-x-survxn-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
 
