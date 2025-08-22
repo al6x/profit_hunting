@@ -8,7 +8,7 @@ includet("../tail-estimator/lib.jl")
 Random.seed!(0)
 Report.configure!(report_path="tail/readme.md", asset_path="tail/readme", asset_url_path="readme")
 
-function prepare_data_daily()
+prepare_data_daily() = begin
   ds = cached("distr-prepare-data-daily") do
     df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv.zip")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
@@ -19,7 +19,7 @@ function prepare_data_daily()
   ds
 end
 
-function prepare_data()
+prepare_data() = begin
   ds = cached("distr-prepare-data-periods") do
     df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv.zip")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
@@ -30,83 +30,7 @@ function prepare_data()
   ds
 end
 
-report("""
-  Estimating tail exponent of stock log returns
-
-  **Goal**: Estimate left and right tails on 1d, 30d, 365d log returns, using Extreme Value Theory,
-  [POT GPT DEDH-HILL method](/tail-estimator).
-
-  Most interesting periods are 1d and 30d. Larger periods >=60d have much less data and shown for
-  comparison only.
-
-  **Results**: in my opinion **right tail ν=3.6, left tail ν=2.2-2.7**, for all 1d-1095d periods.
-
-  I think normalised returns give the most reliable estimation. Estimates for raw
-  return and returns grouped by volatility deciles are for comparison mostly.
-
-  1d: right tail ν=3.6, left tail with synthetic bankrupts ν=2.2, left tail without
-  bankrupts (the data is biased, no bankrupt distress delisting) ν=3.2. Maybe for the left
-  tail something in between should be choosen, like ν=2.5, as we can't say for sure if
-  synthetic bankrupts are correct approximation of real bankrupts.
-
-  30d: right tail ν=4.6, left tail with synthetic bankrupts ν=1.2, left tail without
-  bankrupts ν=4.0. I think it has same tails as 1d, because tail exponent resistant to
-  aggregation, we observe less heavy tails for 30d because there's x30 less data. The left tail
-  with synthetic bankrupts is unusually small, I guess because it's only approximation of real
-  bankrupts, and it distort the estimator and should be ignored.
-
-  Larger periods >=60d: I think estimates for larger periods are wrong, because they have much
-  less data, and present for comparison only. I think they have same tail exponents
-  as 1d, because tail exponent is resistant to aggregation.
-
-  **Data**: Daily prices of 250 stocks all starting with 1972, [details](/hist_data)`.
-
-  1d and 30d returns calculated with moving window(size=30, step-30).
-
-  For larger periods >=60d, cacluation a bit more complex, using cohorts, you can ignore details
-  and just consider it as multiple version of same returns, you will see it as multiple lines
-  on plots with periods >=60d. It's used to get more information from the data and avoid
-  overlapping bias, correlation, returns calculated as moving window(start=cohort, size=period,
-  step=period), each cohort shifts initial position by +30.
-
-  **Questions**:
-
-  - I used approach different from standard EVT POT GPD. The standard approaches
-    have problems MLE - huge bias and variance, HILL - very sensitive to threshold
-    parameter and even then has bias, DEDH - the best, but still has some bias. I found combining
-    DEDH-HILL gives the best result. And the threshold choosen differently, assuming that log return
-    tails are somewhat similar to StudenT tails, the optimal threshold found by simulation.
-    I think it's the best approach, more precise than standard EVT. It's described
-    in [/tail-estimator](/tail-estimator) experiment. The standard DEDH method would produce almost
-    same results.
-
-  - I think the **tail exponent resistant to aggregation** and so should be the same for 1d,
-    30d, 365d log returns. Mathematically it is so `Pr(X>x) ~ Cx^-ν`, ν doesn't depend on
-    aggregation.  The empirical estimation shows different story - tail exponent is growing with
-    the period, but I believe it's a random artefact, because there's much less data for
-    larger periods, and in reality tail exponent is the same.
-
-  - The data is biased, no bankrupts, so the left tail estimation as 2.2, calculated with adding
-    synthetic bankrupts is approximate. If you have access to full market unbiased data,
-    please **let me know**, I would be interested to analyse it, for free.
-
-  - If you find errors or know better way, please let me know.
-
-  **Run**: `julia tail/tail.jl`.
-
-  # Bankrupts
-
-  The data has survivorship bias, no bankrupt delisted stocks. Left tail exponent estimated twice,
-  on raw data and data with syntetic bankrupts added.
-
-  Syntetic bankrupts are added with 2%/year probability of `log(0.1)` return.
-
-  Left tail exponent with syntetic banrkupt should be treated only as very approximate number and
-  probably someting in between of with and without bankrupts should be used.
-
-  If you have access to **unbiased data**, please let me know I would be interested to analyse it
-  and see results.
-""")
+report(read("$(@__DIR__)/readme.t.md", String))
 
 ds = prepare_data();
 ds_d = prepare_data_daily();
