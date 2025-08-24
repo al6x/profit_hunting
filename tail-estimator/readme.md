@@ -1,15 +1,26 @@
 Estimating Tail Exponent
 
-**Goal**: Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Real case - estimate tail
+Run `julia evt/evt.jl`.
+
+# Goal
+
+Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Real case - estimate tail
 exponent of asymmetric distribution that has tails similar to `StudentT`.
 
-**Problem**: POT is biased, it fails to estimate `ν` even on large 50k samples, systematically
+# Problem
+
+POT is biased, it fails to estimate `ν` even on large 50k samples, systematically
 underestimating it.
 
-**Solution**: the `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` is better, with properly choosen
+# Solution
+
+The combined estimater `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` is better, with properly choosen
 treshold quantile `q = 0.985` it has almost zero bias and smaller variance.
 
-### Experiment
+I assume it would work for narrow case only - when tails are similar to `StudentT(ν)`, but that's
+exactly what we are interested in.
+
+# Experiment
 
 Data: 100 trials of `StudentT(ν=const)`, 20k sample each.
 
@@ -18,12 +29,18 @@ quantile bias and variance calculated across trials.
 
 The quantile used instead of explicit treshold to make estimation independent of the sample size.
 
-**Notes:**
+# Notes
 
 POT estimates full GPD, DEDH and HILL only the linear tail slope, so optimal quantile threshold
 is different.
 
-Run `julia evt/evt.jl`.
+Another study got similar results, huge errors in estimators,
+
+[Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf),
+one of authors is Laurens de Haan, pioneer of EVT and inventor of one of the best estimators
+"DEDH", so I guess numbers they got are reliable. Check results in
+[Table 1](docs/study1-table1.jpg) - huge errors, and it's the mean across many simulations, so
+the errors for individual simulations is even larger.
 
 ### Estimators comparision (ν=3, sample size=20000, trials = 100)
 

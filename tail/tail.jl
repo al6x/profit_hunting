@@ -8,6 +8,16 @@ includet("../tail-estimator/lib.jl")
 Random.seed!(0)
 Report.configure!(report_path="tail/readme.md", asset_path="tail/readme", asset_url_path="readme")
 
+function assign_quantiles!(ds, name)
+  ranks = ordinalrank(ds[!, name])
+  q = (ranks .- 1) ./ (length(ds[!, name]) - 1)
+
+  ds[!, "$(name)_q"] = q
+  ds[!, "$(name)_dc"] = min.(floor.(Int, q .* 10) .+ 1, 10)
+  ds[!, "$(name)_g5"] = min.(floor.(Int, q .* 5) .+ 1, 5)
+  ds
+end
+
 prepare_data_daily() = begin
   ds = cached("distr-prepare-data-daily") do
     df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv.zip")
@@ -16,6 +26,14 @@ prepare_data_daily() = begin
 
   ds.period = ds.period_d
   ds.lr = ds.lr_t2
+  ds.lr_rf = ds.lr_rf_1y_t
+
+  ds = vcat([begin
+    assign_quantiles!(g, :vol)
+    assign_quantiles!(g, :lr_rf)
+    g
+  end for g in groupby(ds, :period)]...)
+
   ds
 end
 
@@ -27,6 +45,14 @@ prepare_data() = begin
 
   ds.period = ds.period_d
   ds.lr = ds.lr_t2
+  ds.lr_rf = ds.lr_rf_1y_t
+
+  ds = vcat([begin
+    assign_quantiles!(g, :vol)
+    assign_quantiles!(g, :lr_rf)
+    g
+  end for g in groupby(ds, :period)]...)
+
   ds
 end
 
@@ -69,25 +95,50 @@ calc_tail(x, tq, calc_gpd) = begin
   (; survx, survxn, survy, ν, survy_m)
 end;
 
-# Tails on raw returns -----------------------------------------------------------------------------
+# Tails on normalised returns ----------------------------------------------------------------------
+normalise_returns_by_vol(ds) = vcat([begin
+  v = g.lr
+  z = v .- mean(v)
+  z ./ mean(abs.(z))
+end for g in groupby(ds, :vol_dc)]...);
+
+calc_right_tail_norm(ds, period, _) = begin
+  x = normalise_returns_by_vol(ds)
+  tq = optimal_tail_quantile(length(x))
+  calc_tail(x, tq, period <= 365)
+end;
+
+calc_left_tail_norm(ds, period, _) = begin
+  x = -normalise_returns_by_vol(ds)
+  tq = optimal_tail_quantile(length(x))
+  calc_tail(x, tq, period <= 365)
+end;
+
+calc_left_tail_norm_with_bankrupts(ds, period, _) = begin
+  # Adding syntethic bankrupts (distress delisting), 2%/year with return log(0.1)
+  lrsn = normalise_returns_by_vol(ds)
+  years_per_row = period == 1 ? 1/(365*0.69) : period/365
+  ny = length(lrsn) * years_per_row
+  nb = round(Int, ny * 0.02)
+  br = log(0.1)
+  # Bankrupt returns also should be normalised, using stats of average returns in
+  # volatility groups 5,6
+  avg_lrs = ds[(ds.vol_dc .== 5) .| (ds.vol_dc .== 6), :].lr
+  avg_lrs_mean = mean(avg_lrs)
+  brn = (br - avg_lrs_mean) / mean(abs.(avg_lrs .- avg_lrs_mean))
+  lrsn = [lrsn..., fill(brn, nb)...]
+
+  x = -lrsn
+  tq = optimal_tail_quantile(length(x))
+  calc_tail(x, tq, period <= 60)
+end;
+
 group_by_period_cohort(op, ds) = begin
   DataFrame(combine(groupby(ds, [:period, :cohort])) do g
     period, cohort = g.period[1], g.cohort[1]
     results = op(g, period, cohort)
     spread((; period, cohort, results...))
   end)
-end;
-
-calc_right_tail(ds, period, _) = begin
-  x = ds.lr
-  tq = optimal_tail_quantile(length(x))
-  calc_tail(x, tq, period <= 365)
-end;
-
-calc_left_tail(ds, period, _) = begin
-  x = -ds.lr
-  tq = optimal_tail_quantile(length(x))
-  calc_tail(x, tq, period <= 365)
 end;
 
 calc_left_tail_with_bankrupts(ds, period, _) = begin
@@ -132,54 +183,6 @@ c_tail(name, calc, max_period=1095) = begin
   report("$name table")
   report_code(total_s)
   report_code(grouped_s)
-end
-
-report("""
-  # Estimating tail of raw log returns
-
-  1d and 30d are most interesting. Periods >=60d have much less data and show for visual comparison
-  only. Multiple lines on >=60d periods are cohorts, ignore it.
-""")
-c_tail("Right Tail", calc_right_tail)
-c_tail("Left Tail", calc_left_tail)
-c_tail("Left Tail with Bankrupts", calc_left_tail_with_bankrupts, 60)
-
-# Tails on normalised returns ----------------------------------------------------------------------
-normalise_returns_by_vol(ds) = vcat([begin
-  v = g.lr
-  z = v .- mean(v)
-  z ./ mean(abs.(z))
-end for g in groupby(ds, :vol_dc)]...);
-
-calc_right_tail_norm(ds, period, _) = begin
-  x = normalise_returns_by_vol(ds)
-  tq = optimal_tail_quantile(length(x))
-  calc_tail(x, tq, period <= 365)
-end;
-
-calc_left_tail_norm(ds, period, _) = begin
-  x = -normalise_returns_by_vol(ds)
-  tq = optimal_tail_quantile(length(x))
-  calc_tail(x, tq, period <= 365)
-end;
-
-calc_left_tail_norm_with_bankrupts(ds, period, _) = begin
-  # Adding syntethic bankrupts (distress delisting), 2%/year with return log(0.1)
-  lrsn = normalise_returns_by_vol(ds)
-  years_per_row = period == 1 ? 1/(365*0.69) : period/365
-  ny = length(lrsn) * years_per_row
-  nb = round(Int, ny * 0.02)
-  br = log(0.1)
-  # Bankrupt returns also should be normalised, using stats of average returns in
-  # volatility groups 5,6
-  avg_lrs = ds[(ds.vol_dc .== 5) .| (ds.vol_dc .== 6), :].lr
-  avg_lrs_mean = mean(avg_lrs)
-  brn = (br - avg_lrs_mean) / mean(abs.(avg_lrs .- avg_lrs_mean))
-  lrsn = [lrsn..., fill(brn, nb)...]
-
-  x = -lrsn
-  tq = optimal_tail_quantile(length(x))
-  calc_tail(x, tq, period <= 60)
 end;
 
 report("""
@@ -195,6 +198,9 @@ report("""
   based on the current volatility. Current volatility calculated as previous log return
   for daily returns and EMA for larger periods. Each return treated individually, so same stock
   may have different volatility deciles for different returns.
+
+  1d tails on chart start with lower probability because 1d has more data and treshold
+  quantile for the tail is higher.
 """)
 
 c_tail("Right Tail Norm", calc_right_tail_norm)
@@ -210,9 +216,6 @@ group_by_period_cohort_vol(op, ds) = begin
   end)
 end;
 
-# report("1d tails on chart start with lower probability because 1d has more data and treshold
-# quantile for the tail is higher")
-
 calc_right_tail_by_vol(ds, period, _, _) = begin
   tq = optimal_tail_quantile(nrow(ds))
   calc_tail(ds.lr, tq, period <= 60);
@@ -223,21 +226,21 @@ calc_left_tail_by_vol(ds, period, _, _) = begin
   calc_tail(-ds.lr, tq, period <= 60);
 end;
 
-c_tail_by_vol(name, calc_by_vol, max_period=1095) = begin
+c_tail_by_vol(name, calc, max_period=1095) = begin
   by_vol = vcat(
-    group_by_period_cohort_vol(calc_by_vol, ds_d),
-    group_by_period_cohort_vol(calc_by_vol, ds[ds.period .<= max_period, :])
+    group_by_period_cohort_vol(calc, ds_d),
+    group_by_period_cohort_vol(calc, ds[ds.period .<= max_period, :])
   );
 
   plot_xyc_by(
-    name, by_vol;
+    "$name raw", by_vol;
     x="survx", y="survy", y2="survy_m", color="vol_dc", by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.03, 4), ydomain=(2e-6, 0.015)
   );
 
   plot_xyc_by(
-    "$name Norm", by_vol;
+    name, by_vol;
     x="survxn", y="survy", y2="survy_m", color="vol_dc", by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-6, 0.015)
@@ -269,5 +272,28 @@ report("""
 
 c_tail_by_vol("Right Tail by Vol", calc_right_tail_by_vol)
 c_tail_by_vol("Left Tail by Vol", calc_left_tail_by_vol)
+
+# Tails on raw returns -----------------------------------------------------------------------------
+calc_right_tail(ds, period, _) = begin
+  x = ds.lr
+  tq = optimal_tail_quantile(length(x))
+  calc_tail(x, tq, period <= 365)
+end;
+
+calc_left_tail(ds, period, _) = begin
+  x = -ds.lr
+  tq = optimal_tail_quantile(length(x))
+  calc_tail(x, tq, period <= 365)
+end;
+
+report("""
+  # Estimating tail of raw log returns
+
+  1d and 30d are most interesting. Periods >=60d have much less data and show for visual comparison
+  only. Multiple lines on >=60d periods are cohorts, ignore it.
+""")
+c_tail("Right Tail", calc_right_tail)
+c_tail("Left Tail", calc_left_tail)
+c_tail("Left Tail with Bankrupts", calc_left_tail_with_bankrupts, 60)
 
 println("Done")
