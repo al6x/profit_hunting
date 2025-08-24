@@ -39,10 +39,10 @@ is different.
 
 Another [study](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf) got similar
 results, huge errors for various estimators, one of authors is Laurens de Haan, pioneer of EVT and
-inventor of one of the best estimators "DEDH", so I guess numbers they got are reliable.
-They sampled StudentT with known ν and then estimated it [Table 1](docs/study1-table1.jpg) - huge
-errors, and it's the mean across many simulations, the errors for individual simulation is even
-larger.
+inventor of one of the best estimators "DEDH", so I assume they know what they are doing and
+numbers they got are reliable. They sampled StudentT with known ν and then estimated it
+[Table 1](docs/study1-table1.jpg) - huge errors, and it's the mean across many simulations, the
+errors for individual simulation is even larger.
 
 ### Estimators comparision (ν=3, sample size=20000, trials = 100)
 

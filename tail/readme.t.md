@@ -11,10 +11,10 @@ Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
 Tail exponents extimated by [POT GPD DEDH-HILL](/tail-estimator) EVT estimator.
 
-1d normalised returns: **right tail ν=3.6, left tail ν=3.2**, left tail with synthetic bankrupts
-ν=2.2.
+1d normalised returns: **right tail ν=3.6, left tail ν=3.2**.
 
-30d normalised returns: right tail ν=4.6, left tail ν=4.0, left tail with synthetic bankrupts ν=1.2. Note 30d has x30 less data than 1d returns, so numbers may be underestimated.
+30d normalised returns: right tail ν=4.6, left tail ν=4.0. Note 30d has x30 less data than 1d
+returns, so numbers may be underestimated.
 
 Larger periods >=60d: I think estimates for larger periods are wrong, because they have much
 less data, and present for comparison only. I think they have same tail exponents as 1d, because
@@ -23,17 +23,19 @@ tail exponent is resistant to aggregation.
 I think normalised returns give the most reliable estimation. Estimates for raw return and returns
 grouped by volatility deciles are for comparison mostly.
 
-Data has survivorship bias - no bankrupts stocks (distress delisted), so left tail may be wrong.
-Left tail estimated two ways on original data and with synthetically added bankrupts. But,
-synthetic bankrupts are approximation and for comparison mostly.
-
 I use unusual estimator, a combination of [DEDH-HILL is more reliable](/tail-estimator), it produced
 the best results. It works for narrow case only - for tails that are similar to StudentT tails,
 but that's exactly what log returns are.
 
-# Inferred Results
+Data has survivorship bias - no bankrupts stocks (distress delisted), so left tail may be wrong.
+Left tail estimated two ways on original data and with synthetically added bankrupts. But,
+synthetic bankrupts are approximation and for comparison mostly. Left tail estimated with synthetic
+bankrupts 1d ν=2.2, 30d ν=1.2.
 
-Problem - financial data, especially in tails are noisy and limited and may not be representative.
+# Corrected Results
+
+Problem - financial data, especially in tails are noisy and limited and may not be representative,
+so we can't blindly trust results.
 
 In my opinion: **right tail ν=3.1, left tail ν=3.1**, for all 1d-1095d periods.
 
@@ -49,7 +51,7 @@ Reasoning - **I think it's worth to consider results of other studies**, because
 Results from KS estimator: left tail 3.4, right tail 2.97 from [Table 7](docs/study1-table7.jpg). Estimator has bias 3/2.85 from [Table 1](docs/study1-table1.jpg). Correcting results left tail
 3.4 * 3/2.85 = 3.58, right tail 2.97 * 3/2.85 = 3.13.
 
-**Study2** - various mentions by N. Taleb that tails ~3.
+**Study2**: various mentions by N. Taleb that tails ~3.
 
 Combining results for left tail:
 
@@ -70,7 +72,7 @@ more like 3. I think it's safer to choose something in between ~3.1.
 
 Larger periods >=30d show steady growth of tail exponents, I think it's because they have x30, x60,
 x360 less data. Mathematically the exponent resistant to aggregation `Pr(X>x|for large x) ~ Cx^-ν`.
-So, I think **30d and larger periods have same tails as 1d**
+So, I think **30d and larger periods have same tails as 1d**.
 
 # Data
 
@@ -104,7 +106,7 @@ larger periods, and in reality tail exponent is the same.
 My data is biased, no bankrupts, if you have access to full market unbiased data,
 **let me know** please, I would be interested to analyse it.
 
-If you find errors or know a better way, let me know please .
+If you find errors or know a better way, let me know please.
 
 # Bankrupts
 

@@ -162,7 +162,7 @@ c_tail(name, calc, max_period=1095) = begin
   );
 
   plot_xyc_by(
-    name, by_cohort;
+    name, by_cohort; mark=:line_with_points,
     x="survxn", y="survy", y2="survy_m", by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-7, 0.015)
