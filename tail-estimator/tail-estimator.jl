@@ -23,15 +23,15 @@ report("""
 
   # Problem
 
-  POT is biased, it fails to estimate `ν` even on large 50k samples, systematically
-  underestimating it.
+  Most POT estimators are biased, failing to estimate `ν` even on large 50k samples,
+  having huge bias and variance.
 
   # Solution
 
   The combined estimater `ξ = 1/mean(1/DEDH.ξ, 1/HILL.ξ)` is better, with properly choosen
-  treshold quantile `q = 0.985` it has almost zero bias and smaller variance.
+  treshold quantile `q >= 0.985` it has almost zero bias and small variance.
 
-  I assume it would work for narrow case only - when tails are similar to `StudentT(ν)`, but that's
+  I assume it works only for narrow case when tails are similar to `StudentT(ν)`, but that's
   exactly what we are interested in.
 
   # Experiment
@@ -49,12 +49,10 @@ report("""
   is different.
 
   Another study got similar results, huge errors in estimators,
-
-  [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf),
-  one of authors is Laurens de Haan, pioneer of EVT and inventor of one of the best estimators
-  "DEDH", so I guess numbers they got are reliable. Check results in
-  [Table 1](docs/study1-table1.jpg) - huge errors, and it's the mean across many simulations, so
-  the errors for individual simulations is even larger.
+  [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf), one of authors is Laurens de Haan, pioneer of EVT and inventor
+  of one of the best estimators "DEDH", so I guess numbers they got are reliable. Check results
+  in [Table 1](docs/study1-table1.jpg) - huge errors, and it's the mean across many simulations,
+  so the errors for individual simulations is even larger.
 """)
 
 plot_cdf(x, d) = begin
