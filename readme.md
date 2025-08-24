@@ -11,11 +11,11 @@
 
 ![](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
-[Estimting tails for stock returns](tail)
+[Estimating tails for stock returns](tail)
 
 ![](/tail/readme/left-tail-by-vol-x-survxn-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
 
-[Tail Estimator, Extreme Value Theory](tail-estimator)
+[Precision of Tail Estimator, Extreme Value Theory](tail-estimator)
 
 ![](tail-estimator/readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
 
