@@ -1,74 +1,74 @@
-show_plots = false
+show_plots = true
 
+# coolwarm, icefire
 function plot_xyc_by(
-  title, ds; x, y, y2=nothing, c, by, xdomain=nothing, ydomain=nothing, palette="coolwarm", xscale="linear", yscale="linear",
-  pointsize=3
+  tparts, ds; x, y, y2=nothing, color=nothing, by=nothing, detail=nothing,
+  xdomain=nothing, ydomain=nothing, scheme="redblue",
+  xscale="linear", yscale="linear", pointsize=30, mark=:line,
+  width=1024, height=1024
 )
-  py"""
-  show_plots = $(show_plots)
-  markersize = $(pointsize)
-  title, xdomain, ydomain, palette, xscale, yscale = $(title), $(xdomain), $(ydomain), $(palette), $(xscale), $(yscale)
-  by, x, y, y2, color = $(by), $(x), $(y), $(y2), $(c)
-  df = $(to_dict(ds))
+  tparts = ["$tparts x=$x, y=$y"]
+  color  !== nothing && push!(tparts, "color=$color")
+  detail !== nothing && push!(tparts, "($detail)")
+  y2     !== nothing && push!(tparts, ", dashed=$y2")
+  by     !== nothing && push!(tparts, " by=$by")
+  ftitle = join(tparts, "")
 
-  ftitle = f"{title} (x={x}, y={y}, c={color}{', dashed=' + y2 if y2 is not None else ''}, by {by})"
+  xscale_props = xdomain === nothing ? (type=xscale,) : (type=xscale, domain=xdomain)
+  yscale_props = ydomain === nothing ? (type=yscale,) : (type=yscale, domain=ydomain)
 
-  import pandas as pd
-  import numpy as np
-  import matplotlib.pyplot as plt
-  import math
-  from lib.helpers import save_asset
+  color_props = color === nothing ? (;) :
+    (; color=(field=color, type=:ordinal, scale=(scheme=scheme, reverse=true)))
+  detail_props = detail === nothing ? (;) :
+    (; detail=(field=detail, type=:ordinal))
+  poinsize_props = mark == :point ? (size=(value=pointsize,),) : (;)
 
-  df = pd.DataFrame(df)
+  # y1
+  layers = []
+  mark_props1 =
+    mark == :line             ? (type=:line, clip=true) :
+    mark == :line_with_points ? (type=:line, clip=true, point=true) :
+    (type=:circle, clip=true,)
+  encoding1 = (
+    x = (field=x, type=:quantitative, scale=xscale_props),
+    y = (field=y, type=:quantitative, scale=yscale_props),
+    color_props...,
+    detail_props...,
+    poinsize_props...
+  )
+  push!(layers, (mark=mark_props1, encoding=encoding1,))
 
-  periods = sorted(df[by].unique())
-  ncols, nrows = 3, math.ceil(len(periods)/3)
-  fig, axes = plt.subplots(nrows, ncols, figsize=(4*ncols, 3*nrows), squeeze=False)
-
-  if palette == "coolwarm":
-    cmap = plt.get_cmap('coolwarm', len(df[color].unique()))
-    palette_colors = {v: cmap(i) for i, v in enumerate(sorted(df[color].unique()))}
-  elif palette == "icefire":
-    import seaborn as sns
-    palette_vals = sns.color_palette("icefire", n_colors=len(df[color].unique()))
-    palette_colors = {v: palette_vals[i] for i, v in enumerate(sorted(df[color].unique()))}
-  else:
-    raise ValueError(f"Unsupported palette: {palette}")
-
-  for ax, per in zip(axes.flat, periods):
-    ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
-    sub = df[df[by] == per]
-    for lvl in sorted(df[color].unique()):
-      grp = sub[sub[color] == lvl]
-      if grp.empty: continue
-      ax.plot(
-        grp[x], grp[y], linestyle='-', marker='o', color=palette_colors[lvl], label=lvl, alpha=0.7,
-        markersize=markersize, linewidth=2
-      )
-      if y2 is not None:
-        ax.plot(grp[x], grp[y2], linestyle='--', marker='o', color=palette_colors[lvl],
-          markersize=markersize, linewidth=1)
-    ax.set_title(per); ax.set_xlabel(''); ax.set_ylabel('')
-    if xscale == "log": ax.set_xscale('log')
-    if yscale == "log": ax.set_yscale('log')
-    if xdomain: ax.set_xlim(
-      left=xdomain[0] if xdomain[0] is not None else ax.get_xlim()[0],
-      right=xdomain[1] if xdomain[1] is not None else ax.get_xlim()[1]
+  if y2 !== nothing
+    mark_props2 =
+      mark == :line ?             (type=:line, clip=true, strokeDash=[4,4]) :
+      mark == :line_with_points ? (type=:line, clip=true, strokeDash=[4,4], point=true) :
+      (type=:point, clip=true, shape=:diamond)
+    encoding2 = (;
+      encoding1...,
+      y = (field=y2, type=:quantitative, scale=yscale_props),
     )
-    if ydomain: ax.set_ylim(
-      bottom=ydomain[0] if ydomain[0] is not None else ax.get_ylim()[0],
-      top=ydomain[1] if ydomain[1] is not None else ax.get_ylim()[1]
+    push!(layers, (mark=mark_props2, encoding=encoding2,))
+  end
+
+  # Spec
+  columns = 3
+  width_prop  = by === nothing ? width  : ceil(Int, width/columns)
+  height_prop = by === nothing ? height : ceil(Int, height/columns)
+  vspec = by === nothing ?
+    (title=ftitle, layer=layers) :
+    (
+      title=ftitle,
+      facet=(field=String(by), type=:ordinal),
+      columns,
+      spec=(layer=layers, width=width_prop, height=height_prop)
     )
 
-  for ax in axes.flat[len(periods):]: fig.delaxes(ax)  # remove empty plots
-  handles, labels = axes.flat[0].get_legend_handles_labels()
-  fig.legend(handles, labels, title=color, loc='lower right', bbox_to_anchor=(0.9, 0.05))
-  fig.suptitle(ftitle); plt.tight_layout()
-  if show_plots: plt.show()
-  save_asset(fig, ftitle, clear=False)
-  plt.close(fig)
-  """
+  spec = VegaLite.VLSpec(JSON.parse(JSON.json(vspec)))
+  fig = spec(ds)
+  display(fig)
+  save_asset(ftitle, fig)
 end
+
 
 function plot_by_vol_by_rf(title, ds_vol, ds_rf; ylabel, solid_label, ydomain=nothing, y, y2=nothing, xscale=nothing, yscale=nothing)
   show_plotsv = show_plots

@@ -12,14 +12,15 @@ default(dpi=200, titlefontsize = 10, markerstrokewidth = 0, legend=false, marker
 Random.seed!(1);
 
 report("""
-  Estimating Tail Exponent
+  High precision estimator for Tail Exponent, Extreme Value Theory
 
   Run `julia evt/evt.jl`.
 
   # Goal
 
-  Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Use case - estimate tails of stock
-  log returns distribution, it's asymmetric and has tails similar to `StudentT`.
+  Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]` with high precision. Use case -
+  estimate tails of stock log returns distribution, it's asymmetric and has tails similar
+  to `StudentT`.
 
   # Problem
 
@@ -37,6 +38,8 @@ report("""
   # Experiment
 
   Data: 100 trials of `StudentT(ν=const)`, 20k sample each.
+
+  Varius estimators used MLE, Weighted Moments, Hill, DEDH and DEDH-HILL.
 
   Various treshold quantiles `q ∈ [0.95, 0.995]` used to estimate the tail exponent. For each
   quantile bias and variance calculated across trials.

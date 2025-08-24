@@ -15,7 +15,7 @@
 
 ![](/tail/readme/left-tail-by-vol-x-survxn-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
 
-[Precision of Tail Estimator, Extreme Value Theory](tail-estimator)
+[High precision estimator for Tail Exponent, Extreme Value Theory](tail-estimator)
 
 ![](tail-estimator/readme/dedh-hill-25-50-75-iqr-and-rel-bias-variance-3-ssize-20000.png)
 
