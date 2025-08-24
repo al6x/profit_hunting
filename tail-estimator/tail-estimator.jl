@@ -18,8 +18,8 @@ report("""
 
   # Goal
 
-  Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Real case - estimate tail
-  exponent of asymmetric distribution that has tails similar to `StudentT`.
+  Estimate tail exponent of `StudentT(ν) | ν ∈ [1.5, 10]`. Use case - estimate tails of stock
+  log returns distribution, it's asymmetric and has tails similar to `StudentT`.
 
   # Problem
 
