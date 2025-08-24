@@ -48,11 +48,12 @@ report("""
   POT estimates full GPD, DEDH and HILL only the linear tail slope, so optimal quantile threshold
   is different.
 
-  Another study got similar results, huge errors in estimators,
-  [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf), one of authors is Laurens de Haan, pioneer of EVT and inventor
-  of one of the best estimators "DEDH", so I guess numbers they got are reliable. Check results
-  in [Table 1](docs/study1-table1.jpg) - huge errors, and it's the mean across many simulations,
-  so the errors for individual simulations is even larger.
+  Another [study](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf) got similar
+  results, huge errors for various estimators, one of authors is Laurens de Haan, pioneer of EVT and
+  inventor of one of the best estimators "DEDH", so I guess numbers they got are reliable.
+  They sampled StudentT with known ν and then estimated it [Table 1](docs/study1-table1.jpg) - huge
+  errors, and it's the mean across many simulations, the errors for individual simulation is even
+  larger.
 """)
 
 plot_cdf(x, d) = begin
