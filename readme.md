@@ -5,7 +5,7 @@
 
 [Stock Expected Return E[R]](mean)
 
-![](mean/readme/mean-e-r-x-lr-rf-y-adjusted-c-volg-dashed-original-by-period.png)
+![](mean/readme/mean-e-r-by-t-vol-and-t-rf-solid-adjusted.png)
 
 [Stock Option Normalisation](option_norm)
 
