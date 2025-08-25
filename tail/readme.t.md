@@ -4,7 +4,9 @@ Run `julia tail/tail.jl`.
 
 # Goal
 
-Estimate left and right tails for stock log returns for 1d, 30d, 365d periods, from historical data.
+Estimate left and right tails for stock log returns for different periods 1d, 30d, 365d periods
+and volatility levels, from historical data.
+
 Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
 # Results
@@ -37,7 +39,7 @@ bankrupts 1d ν=2.2, 30d ν=1.2.
 Problem - financial data, especially in tails are noisy and limited and may not be representative,
 so we can't blindly trust results.
 
-In my opinion: **right tail ν=3.1, left tail ν=3.1**, for all 1d-1095d periods.
+In my opinion: **right tail ν=3.1, left tail ν=3.1**, for all 1d-1095d periods and all volatilities.
 
 It's **different from the results of this experiment**: right tail ν=3.6, left tail ν=3.2 for 1d,
 and right tail ν=4.6, left tail ν=4.0 for 30d.
