@@ -1,14 +1,16 @@
+using VegaLite
+
 show_plots = true
 
 # coolwarm, icefire
 function plot_xyc_by(
   tparts, ds; x, y, y2=nothing, color=nothing, by=nothing, detail=nothing,
   xdomain=nothing, ydomain=nothing, scheme="redblue",
-  xscale="linear", yscale="linear", pointsize=30, mark=:line,
+  xscale="linear", yscale="linear", pointsize=30, mark=:line, mark2=:line,
   width=1024, height=1024
 )
   tparts = ["$tparts x=$x, y=$y"]
-  color  !== nothing && push!(tparts, "color=$color")
+  color  !== nothing && push!(tparts, ", color=$color")
   detail !== nothing && push!(tparts, "($detail)")
   y2     !== nothing && push!(tparts, ", dashed=$y2")
   by     !== nothing && push!(tparts, " by=$by")
@@ -40,8 +42,8 @@ function plot_xyc_by(
 
   if y2 !== nothing
     mark_props2 =
-      mark == :line ?             (type=:line, clip=true, strokeDash=[4,4]) :
-      mark == :line_with_points ? (type=:line, clip=true, strokeDash=[4,4], point=true) :
+      mark2 == :line ?             (type=:line, clip=true, strokeDash=[4,4]) :
+      mark2 == :line_with_points ? (type=:line, clip=true, strokeDash=[4,4], point=true) :
       (type=:point, clip=true, shape=:diamond)
     encoding2 = (;
       encoding1...,
@@ -65,7 +67,7 @@ function plot_xyc_by(
 
   spec = VegaLite.VLSpec(JSON.parse(JSON.json(vspec)))
   fig = spec(ds)
-  display(fig)
+  show_plots && display(fig)
   save_asset(ftitle, fig)
 end
 

@@ -8,7 +8,7 @@ function plot_xyc_by(
   width=1024, height=1024
 )
   tparts = ["$tparts x=$x, y=$y"]
-  color  !== nothing && push!(tparts, "color=$color")
+  color  !== nothing && push!(tparts, ", color=$color")
   detail !== nothing && push!(tparts, "($detail)")
   y2     !== nothing && push!(tparts, ", dashed=$y2")
   by     !== nothing && push!(tparts, " by=$by")

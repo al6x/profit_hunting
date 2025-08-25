@@ -1,8 +1,15 @@
 includet("./shared.jl")
 
-norm_mean(mmean, period) = log.(mmean) * (365 / period)
-denorm_mean(nmmean, period) = exp.(nmmean * period / 365)
-empir_mmean(lrs) = mean(exp.(lrs))
+Random.seed!(0)
+Report.configure!(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path="readme");
+py"""
+from lib.helpers import configure_report
+configure_report(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path='readme')
+"""
+
+norm_mean(mmean, period) = log.(mmean) * (365 / period);
+denorm_mean(nmmean, period) = exp.(nmmean * period / 365);
+empir_mmean(lrs) = mean(exp.(lrs));
 
 function c_explore_mmean(ds_trunc, ds_orig)
   calc(ds) = begin
@@ -37,26 +44,26 @@ function c_explore_mmean(ds_trunc, ds_orig)
     ylabel="Norm E[R]", solid_label="adjusted", y="nmean", y2="nmean2", ydomain=(0, 0.35)
   )
 
-  ydomain, nydomain = (1, nothing), (0, 0.4)
+  ydomain, nydomain = (1.0, 1.6), (0, 0.4)
   let ds = means_vol_rf
     # x - rf
     plot_xyc_by(
       "Mean E[R]", ds;
-      x="lr_rf", y="adjusted", y2="original", c="volg", by="period", ydomain=ydomain
+      x="lr_rf", y="adjusted", y2="original", color="volg", by="period", ydomain=ydomain
     )
     plot_xyc_by(
       "Norm Mean (365/period)log(E[R])", ds;
-      x="lr_rf", y="nadjusted", y2="noriginal", c="volg", by="period", ydomain=nydomain
+      x="lr_rf", y="nadjusted", y2="noriginal", color="volg", by="period", ydomain=nydomain
     )
 
     # x - vol
     plot_xyc_by(
       "Mean E[R]", ds;
-      x="vol", y="adjusted", y2="original", c="rfg", by="period", ydomain=ydomain
+      x="vol", y="adjusted", y2="original", color="rfg", by="period", ydomain=ydomain
     )
     plot_xyc_by(
       "Norm Mean (365/period)log(E[R])", ds;
-      x="vol", y="nadjusted", y2="noriginal", c="rfg", by="period", ydomain=nydomain
+      x="vol", y="nadjusted", y2="noriginal", color="rfg", by="period", ydomain=nydomain
     )
   end
 end
@@ -94,26 +101,26 @@ function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
     ylabel="(365/period)(E[log R])", solid_label="adjusted", y="nmean", y2="nmean2", ydomain=(-0.05, 0.15)
   )
 
-  ydomain = (-0.05, nothing)
+  ydomain = (-0.05, 0.35)
   let ds = means_vol_rf
     # x - rf
     plot_xyc_by(
       "Log Mean E[log R] $rfg", ds;
-      x="lr_rf", y="adjusted", y2="original", c="volg", by="period", ydomain=ydomain
+      x="lr_rf", y="adjusted", y2="original", color="volg", by="period", ydomain=ydomain
     )
     plot_xyc_by(
       "Norm Log Mean (365/period)E[log R] $rfg", ds;
-      x="lr_rf", y="nadjusted", y2="noriginal", c="volg", by="period", ydomain=nydomain
+      x="lr_rf", y="nadjusted", y2="noriginal", color="volg", by="period", ydomain=nydomain
     )
 
     # x - vol
     plot_xyc_by(
       "Log Mean E[log R] $rfg", ds;
-      x="vol", y="adjusted", y2="original", c="rfg", by="period", ydomain=ydomain
+      x="vol", y="adjusted", y2="original", color="rfg", by="period", ydomain=ydomain
     )
     plot_xyc_by(
       "Norm Log Mean (365/period)E[log R] $rfg", ds;
-      x="vol", y="nadjusted", y2="noriginal", c="rfg", by="period", ydomain=nydomain
+      x="vol", y="nadjusted", y2="noriginal", color="rfg", by="period", ydomain=nydomain
     )
   end
 end
@@ -125,7 +132,7 @@ report("""
   Exploring the `{T, Vol, RF Rate, E[R]}` shape.
 
   Run `julia mean/mean.jl`.
-"""; print=false)
+""")
 
 ds = prepare_data();
 ds_orig = deepcopy(ds);
@@ -133,7 +140,7 @@ ds_orig = deepcopy(ds);
 # Adjusting data
 tq = 1-1/3650;
 adjust_data_lr!(ds)
-ds = truncate_ds(ds, tq);
+# ds = truncate_ds(ds, tq);
 
 report("""
   # Exploring Mean E[R]
@@ -148,13 +155,13 @@ report("""
   speaking the true mean should account for once in 100 y events, so our estimation is not true mean. The 10y treshold
   also looks to be good as it's has almost no effect on the observable mean.
 """)
-c_explore_mmean(ds, ds_orig)
+c_explore_mmean(ds, ds_orig);
 
 report("# Exploring Log Mean E[log R] with 5 rf groups")
-c_explore_lmean(ds, ds_orig, rfg=:rfg, nydomain = (-0.2, 0.3))
+c_explore_lmean(ds, ds_orig, rfg=:rfg, nydomain = (-0.2, 0.3));
 
 report("# Exploring Log Mean E[log R] with 10 rf groups")
-c_explore_lmean(ds, ds_orig; rfg=:rf_dc, nydomain = (-0.3, 0.4))
+c_explore_lmean(ds, ds_orig; rfg=:rf_dc, nydomain = (-0.3, 0.4));
 
 report("""
 # Data

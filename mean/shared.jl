@@ -3,29 +3,6 @@ includet.(["../lib/Lib.jl", "../lib/Report.jl", "../lib/helpers.jl", "./plots.jl
 using DataFrames, Random, Statistics, StatsBase, Optim, JSON
 using .Lib, .Report
 
-Random.seed!(0)
-# begin
-#   # Config
-
-#   Random.seed!(0)
-#   Report.configure!(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path="readme")
-#   py"""
-#   from lib.helpers import configure_report
-#   configure_report(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path='readme')
-#   """
-# end
-
-# function spread(nt::NamedTuple)
-#   n = nothing
-#   for v in values(nt)
-#     v isa AbstractArray || continue
-#     n === nothing && (n = length(v); continue)
-#     length(v) == n || error("Mismatched lengths among vector fields.")
-#   end
-#   n === nothing && return nt  # No composite fields, return as-is
-#   (; (k => (v isa AbstractArray ? v : fill(v, n)) for (k, v) in pairs(nt))...)
-# end
-
 function group_by_vol_rf(ds, op; volg=:vol_dc, rfg=:rfg)
   volg_medians = Dict(g[!, volg][1] => median(g.vol) for g in groupby(ds, volg))
   rfg_medians = Dict(g[!, rfg][1] => median(g.lr_rf) for g in groupby(ds, rfg))
