@@ -1,7 +1,3 @@
-includet.(["../lib/Lib.jl", "../lib/Report.jl", "../lib/helpers.jl", "./plots.jl"])
-
-using DataFrames, Random, Statistics, StatsBase, Optim, JSON
-using .Lib, .Report
 
 function group_by_vol_rf(ds, op; volg=:vol_dc, rfg=:rfg)
   volg_medians = Dict(g[!, volg][1] => median(g.vol) for g in groupby(ds, volg))
@@ -145,10 +141,11 @@ function adjust_data_lr!(ds)
   end
 end
 
-function truncate_ds(ds, tq)
-  error("add cohort")
-  combine(groupby(ds, :volg)) do g
-    max = quantile(g.lr, tq)
-    filter(:lr => x -> x <= max, g)
+function truncate_by_period_volg_cohort(ds, tq)
+  combine(groupby(ds, [:period, :volg, :cohort])) do g
+    period = g.period[1]
+    min = quantile(g.lr, tq(period))
+    max = quantile(g.lr, 1-tq(period))
+    filter(:lr => x -> min <= x <= max , g)
   end
 end

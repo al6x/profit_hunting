@@ -1,4 +1,7 @@
-includet("./shared.jl")
+includet.(["../lib/Lib.jl", "../lib/Report.jl", "../lib/helpers.jl", "./plots.jl", "./lib.jl"])
+
+using DataFrames, Random, Statistics, StatsBase, Optim, JSON
+using .Lib, .Report
 
 Random.seed!(0)
 Report.configure!(report_path="mean/readme.md", asset_path="mean/readme", asset_url_path="readme");
@@ -17,22 +20,22 @@ function c_explore_mmean(ds_trunc, ds_orig)
     (; mean=m, nmean=norm_mean(m, ds.period[1]))
   end
 
-  means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg=:rfg)
-  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg=:rfg)
-  means_vol_rf.adjusted = means_vol_rf_trunc.mean
-  means_vol_rf.nadjusted = means_vol_rf_trunc.nmean
-  means_vol_rf.original = means_vol_rf.mean
-  means_vol_rf.noriginal = means_vol_rf.nmean
+  means_vol_rf = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg=:rfg)
+  means_vol_rf_orig = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg=:rfg)
+  means_vol_rf.adjusted = means_vol_rf.mean
+  means_vol_rf.nadjusted = means_vol_rf.nmean
+  means_vol_rf.original = means_vol_rf_orig.mean
+  means_vol_rf.noriginal = means_vol_rf_orig.nmean
 
-  means_vol = group_by_vol(ds_orig, calc; volg=:vol_dc)
-  means_vol_trunc = group_by_vol(ds_trunc, calc; volg=:vol_dc)
-  means_vol.mean2  = means_vol_trunc.mean
-  means_vol.nmean2 = means_vol_trunc.nmean
+  means_vol = group_by_vol(ds_trunc, calc; volg=:vol_dc)
+  means_vol_orig = group_by_vol(ds_orig, calc; volg=:vol_dc)
+  means_vol.mean2  = means_vol_orig.mean
+  means_vol.nmean2 = means_vol_orig.nmean
 
-  means_rf  = group_by_rf(ds_orig, calc; rfg=:rfg)
-  means_rf_trunc  = group_by_rf(ds_trunc, calc; rfg=:rfg)
-  means_rf.mean2   = means_rf_trunc.mean
-  means_rf.nmean2  = means_rf_trunc.nmean
+  means_rf  = group_by_rf(ds_trunc, calc; rfg=:rfg)
+  means_rf_orig  = group_by_rf(ds_orig, calc; rfg=:rfg)
+  means_rf.mean2   = means_rf_orig.mean
+  means_rf.nmean2  = means_rf_orig.nmean
 
   plot_by_vol_by_rf(
     "Mean E[R]", means_vol, means_rf;
@@ -66,7 +69,7 @@ function c_explore_mmean(ds_trunc, ds_orig)
       x="vol", y="nadjusted", y2="noriginal", color="rfg", by="period", ydomain=nydomain
     )
   end
-end
+end;
 
 function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
   calc(ds) = begin
@@ -74,22 +77,22 @@ function c_explore_lmean(ds_trunc, ds_orig; rfg, nydomain)
     (; mean=m, nmean=m*(365 / ds.period[1]))
   end
 
-  means_vol_rf = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg)
-  means_vol_rf_trunc = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg)
-  means_vol_rf.adjusted = means_vol_rf_trunc.mean ./ (means_vol_rf.vol/0.015)
-  means_vol_rf.nadjusted = means_vol_rf_trunc.nmean ./ (means_vol_rf.vol/0.015)
-  means_vol_rf.original = means_vol_rf.mean
-  means_vol_rf.noriginal = means_vol_rf.nmean
+  means_vol_rf = group_by_vol_rf(ds_trunc, calc; volg=:volg, rfg)
+  means_vol_rf_orig = group_by_vol_rf(ds_orig, calc; volg=:volg, rfg)
+  means_vol_rf.adjusted = means_vol_rf.mean
+  means_vol_rf.nadjusted = means_vol_rf.nmean ./ (means_vol_rf.vol/0.015)
+  means_vol_rf.original = means_vol_rf_orig.mean
+  means_vol_rf.noriginal = means_vol_rf_orig.nmean ./ (means_vol_rf.vol/0.015)
 
-  means_vol = group_by_vol(ds_orig, calc; volg=:vol_dc)
-  means_vol_trunc = group_by_vol(ds_trunc, calc; volg=:vol_dc)
-  means_vol.mean2  = means_vol_trunc.mean
-  means_vol.nmean2 = means_vol_trunc.nmean
+  means_vol = group_by_vol(ds_trunc, calc; volg=:vol_dc)
+  means_vol_orig = group_by_vol(ds_orig, calc; volg=:vol_dc)
+  means_vol.mean2  = means_vol_orig.mean
+  means_vol.nmean2 = means_vol_orig.nmean
 
-  means_rf  = group_by_rf(ds_orig, calc; rfg)
-  means_rf_trunc  = group_by_rf(ds_trunc, calc; rfg)
-  means_rf.mean2   = means_rf_trunc.mean
-  means_rf.nmean2  = means_rf_trunc.nmean
+  means_rf  = group_by_rf(ds_trunc, calc; rfg)
+  means_rf_orig  = group_by_rf(ds_orig, calc; rfg)
+  means_rf.mean2   = means_rf_orig.mean
+  means_rf.nmean2  = means_rf_orig.nmean
 
   plot_by_vol_by_rf(
     "Log Mean E[log R] $rfg", means_vol, means_rf;
@@ -138,9 +141,11 @@ ds = prepare_data();
 ds_orig = deepcopy(ds);
 
 # Adjusting data
-tq = 1-1/3650;
+# tq = 1-1/3650;
 adjust_data_lr!(ds)
-# ds = truncate_ds(ds, tq);
+
+# Truncating to once in 10y event for 10 stocks
+# ds = truncate_by_period_volg_cohort(ds, (period) -> 1/((365/period)*10*10));
 
 report("""
   # Exploring Mean E[R]
