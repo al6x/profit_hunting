@@ -9,18 +9,6 @@ and volatility levels, from historical data.
 
 Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
-### Methodology
-
-- Historical log returns `log r_t2 = log S_t/S_t2` for t in [1d, 30d, ..., 1095d].
-  And current volatility `vol_t` as EMA at t.
-- Volatility `nvol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
-  `EMA[MAD[log r]]*sqrt(pi/2)` and historical `MAD[log r]*sqrt(pi/2)` over long period.
-- Normalise log returns as `log r_t2 / nvol_t`, each return individually.
-- Decluster per stock, allow no more than 1 tail event within window = 30d for 1d returns and
-  larger windows for longer periods.
-- Allow clusters across stocks - when many stock drop on same day.
-- EVT POT GPD approach with [DEDH-HILL](/tail-estimator) estimator.
-
 ### Results
 
 ![](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
@@ -48,9 +36,20 @@ In my opinion larger periods follow `ν = a + b log T`, solving it for 1d and 30
 
 Data has both omission (bankrupts) and comission biases - so tails may be a bit wrong.
 
+### Methodology
+
+- Historical log returns `log r_t2 = log S_t/S_t2` for `t in [1d, 30d, ..., 1095d]`.
+- Volatility `nvol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
+  `EMA[MAD[log r]]*sqrt(pi/2)` and historical `MAD[log r]*sqrt(pi/2)` over long period.
+- Normalise log returns as `log r_t2 / nvol_t`, each return individually.
+- Decluster per stock, allow no more than 1 tail event within window = 30d for 1d returns and
+  larger windows for longer periods.
+- Allow clusters across stocks - when many stock drop on same day.
+- EVT POT GPD approach with [DEDH-HILL](/tail-estimator) estimator.
+
 ### Other studies
 
-Results depend on return normalisation, so results may be different.
+Results depend on return normalisation, so may be different.
 
 **Study1**: [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf)
 , one of authors is Laurens de Haan, pioneer of EVT and inventor of one of the best estimators
@@ -76,20 +75,8 @@ step=period), each cohort shifts initial position by +30.
 
 ### Questions
 
-I used approach different from standard EVT POT GPD. The standard approaches
-have problems MLE - huge bias and variance, HILL - very sensitive to threshold
-parameter and even then has bias, DEDH - the best, but still has some bias. I found combining
-DEDH-HILL gives the best result. And the threshold choosen differently, assuming that log return
-tails are somewhat similar to StudenT tails, the optimal threshold found by simulation.
-I think it's the best approach, more precise than standard EVT. It's described
-in [Tail Estimator](/tail-estimator) experiment. The standard DEDH method would produce slightly
-worst results.
-
-I think the **tail exponent resistant to aggregation** and so should be the same for 1d,
-30d, 365d log returns. Mathematically it is so `Pr(X>x) ~ Cx^-ν`, ν doesn't depend on
-aggregation.  The empirical estimation shows different story - tail exponent is growing with
-the period, but I believe it's a random artefact, because there's much less data for
-larger periods, and in reality tail exponent is the same.
+I used unusual estimator [Tail Estimator](/tail-estimator) that in my opinion is much better and
+apply normalisation by volatility and choose tail threshold differently.
 
 My data is biased, no bankrupts, if you have access to full market unbiased data,
 **let me know** please, I would be interested to analyse it.
@@ -98,8 +85,6 @@ If you find errors or know a better way, let me know please.
 
 ### TODO
 
-- Decluster 1d data - across same stock within 30 days, and across multiple stocks - only
-  single stock maxima per same day.
 - In order to avoid submission bias - estimate tail for each stock individually and analyse it.
 - Calculate credible intervals.
 
@@ -124,17 +109,6 @@ Left Tail (Norm) by periods
    3 │     60      4.1      3.7
 ```
 
-```
-4×4 DataFrame
- Row │ period  cohort  tail_k  ν
-     │ Int64   Int64   Int64   Float64
-─────┼─────────────────────────────────
-   1 │      1       0     975      2.7
-   2 │     30       0     974      3.5
-   3 │     60       0     945      4.4
-   4 │     60       1     955      3.9
-```
-
 Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
 
 ![Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
@@ -149,17 +123,6 @@ Right Tail (Norm) by periods
    1 │      1      2.9      2.9
    2 │     30      3.7      3.7
    3 │     60      3.9      3.9
-```
-
-```
-4×4 DataFrame
- Row │ period  cohort  tail_k  ν
-     │ Int64   Int64   Int64   Float64
-─────┼─────────────────────────────────
-   1 │      1       0     969      2.9
-   2 │     30       0     929      3.7
-   3 │     60       0     894      3.8
-   4 │     60       1     882      4.0
 ```
 
 ### Tails by Vol
@@ -446,11 +409,11 @@ Right Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc
 
 ### Tails for all periods.
 
-Left Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-![Left Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+![Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
-Left Tail (Norm) by periods
+Left Tail all Periods (Norm) by periods
 
 ```
 8×3 DataFrame
@@ -467,43 +430,11 @@ Left Tail (Norm) by periods
    8 │   1095      5.4      4.3
 ```
 
-```
-25×4 DataFrame
- Row │ period  cohort  tail_k  ν
-     │ Int64   Int64   Int64   Float64
-─────┼─────────────────────────────────
-   1 │      1       0     975      2.7
-   2 │     30       0     974      3.5
-   3 │     60       0     945      4.4
-   4 │     60       1     955      3.9
-   5 │     91       0     750      5.2
-   6 │     91       1     738      6.9
-   7 │     91       2     746      6.4
-   8 │    182       0     355      5.9
-   9 │    182       1     368      6.8
-  10 │    182       2     363      6.8
-  11 │    182       3     357      6.8
-  12 │    182       4     357      6.8
-  13 │    182       5     362      4.9
-  14 │    365       0     178      5.1
-  15 │    365       1     183      6.8
-  16 │    365       2     178      7.0
-  17 │    365       3     177      7.2
-  18 │    365       4     176      6.7
-  19 │    365       5     182      4.6
-  20 │    365       6     177      6.9
-  21 │    365       7     181      6.3
-  22 │    365       8     187      6.8
-  23 │    365       9     184      6.6
-  24 │    365      10     187      6.8
-  25 │    365      11     187      4.6
-```
+Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+![Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
-![Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
-
-Right Tail (Norm) by periods
+Right Tail all Periods (Norm) by periods
 
 ```
 8×3 DataFrame
@@ -518,38 +449,6 @@ Right Tail (Norm) by periods
    6 │    365      5.1      4.3
    7 │    730      6.8      4.5
    8 │   1095      7.2      4.5
-```
-
-```
-25×4 DataFrame
- Row │ period  cohort  tail_k  ν
-     │ Int64   Int64   Int64   Float64
-─────┼─────────────────────────────────
-   1 │      1       0     969      2.9
-   2 │     30       0     929      3.7
-   3 │     60       0     894      3.8
-   4 │     60       1     882      4.0
-   5 │     91       0     685      3.8
-   6 │     91       1     661      4.2
-   7 │     91       2     684      3.8
-   8 │    182       0     329      3.9
-   9 │    182       1     331      4.6
-  10 │    182       2     337      5.0
-  11 │    182       3     328      4.5
-  12 │    182       4     321      4.2
-  13 │    182       5     326      4.1
-  14 │    365       0     169      4.3
-  15 │    365       1     170      5.2
-  16 │    365       2     164      5.1
-  17 │    365       3     157      5.9
-  18 │    365       4     157      6.8
-  19 │    365       5     162      4.3
-  20 │    365       6     156      6.4
-  21 │    365       7     163      4.1
-  22 │    365       8     169      5.7
-  23 │    365       9     166      4.5
-  24 │    365      10     163      5.3
-  25 │    365      11     166      3.9
 ```
 
 Tails by periods x=period, y=ν, color=type, dashed=ν_model

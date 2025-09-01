@@ -175,16 +175,16 @@ group_by_period_cohort(op, ds) = begin
 end;
 
 c_tail(calc, name, ds, ν_model) = begin
-  by_cohort = group_by_period_cohort(calc, ds)
+  r = group_by_period_cohort(calc, ds)
 
   plot_xyc_by(
-    name, by_cohort; mark=:line_with_points,
+    name, r; mark=:line_with_points,
     x="survxn", y="survy", y2="survy_m", by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-7, 0.015)
   );
 
-  νs = by_cohort[:, [:period, :cohort, :ν]]
+  νs = r[:, [:period, :cohort, :ν]]
   νs = combine(groupby(νs, [:period, :cohort]),
     :ν => length => :tail_k, :ν => first => :ν
   );
@@ -205,7 +205,7 @@ c_tail(calc, name, ds, ν_model) = begin
   # );
 
   report_code(total_s)
-  report_code(grouped_s)
+  # report_code(grouped_s)
   total
 end;
 
@@ -222,12 +222,12 @@ report("""
 c_tail("Left Tail (Norm)", ds[ds.period .<= 60, :], ν_l_model) do g, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
   calc_tail(tail; u, tq)
-end
+end;
 
 c_tail("Right Tail (Norm)", ds[ds.period .<= 60, :], ν_r_model) do g, _, _
   tq, u, tail = get_and_normalise_tail(g; left=false)
   calc_tail(tail; u, tq)
-end
+end;
 
 
 # Tails by key -------------------------------------------------------------------------------------
@@ -346,12 +346,12 @@ end;
 report("# Tails for all periods.");
 
 let
-  ltail = c_tail("Left Tail (Norm)", ds, ν_l_model) do g, _, _
+  ltail = c_tail("Left Tail all Periods (Norm)", ds, ν_l_model) do g, _, _
     tq, u, tail = get_and_normalise_tail(g; left=true)
     calc_tail(tail; u, tq)
   end;
 
-  rtail = c_tail("Right Tail (Norm)", ds, ν_r_model) do g, _, _
+  rtail = c_tail("Right Tail all Periods (Norm)", ds, ν_r_model) do g, _, _
     tq, u, tail = get_and_normalise_tail(g; left=false)
     calc_tail(tail; u, tq)
   end;
