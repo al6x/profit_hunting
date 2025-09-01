@@ -9,18 +9,6 @@ and volatility levels, from historical data.
 
 Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
-# Methodology
-
-- Historical log returns `log r_t2 = log S_t/S_t2` for t in [1d, 30d, ..., 1095d].
-  And current volatility `vol_t` as EMA at t.
-- Volatility `nvol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
-  `EMA[MAD[log r]]*sqrt(pi/2)` and historical `MAD[log r]*sqrt(pi/2)` over long period.
-- Normalise log returns as `log r_t2 / nvol_t`, each return individually.
-- Decluster per stock, allow no more than 1 tail event within window = 30d for 1d returns and
-  larger windows for longer periods.
-- Allow clusters across stocks - when many stock drop on same day.
-- EVT POT GPD approach with [DEDH-HILL](/tail-estimator) estimator.
-
 # Results
 
 ![](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
@@ -47,6 +35,17 @@ In my opinion larger periods follow `ν = a + b log T`, solving it for 1d and 30
 ```
 
 Data has both omission (bankrupts) and comission biases - so tails may be a bit wrong.
+
+# Methodology
+
+- Historical log returns `log r_t2 = log S_t/S_t2` for `t in [1d, 30d, ..., 1095d]`.
+- Volatility `nvol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
+  `EMA[MAD[log r]]*sqrt(pi/2)` and historical `MAD[log r]*sqrt(pi/2)` over long period.
+- Normalise log returns as `log r_t2 / nvol_t`, each return individually.
+- Decluster per stock, allow no more than 1 tail event within window = 30d for 1d returns and
+  larger windows for longer periods.
+- Allow clusters across stocks - when many stock drop on same day.
+- EVT POT GPD approach with [DEDH-HILL](/tail-estimator) estimator.
 
 # Other studies
 

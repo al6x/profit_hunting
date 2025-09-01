@@ -1,5 +1,7 @@
 The data 250 stocks, all stocks start from 1972 and end in 2025.
 
+Data stored separately [daily](https://drive.google.com/file/d/1D1J5LLgcQe_7AGKTRS9z6rKK3YUh5ywX/view?usp=sharing), [larger periods](https://drive.google.com/file/d/1jEyQLTObX3v_J85t3eVh21-rg7D5E7aj/view?usp=sharing).
+
 Data has both comission (large cap) and omission biases (no bankrupts).
 
     - symbol: Stock symbol
