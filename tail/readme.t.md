@@ -49,7 +49,7 @@ Data has both omission (bankrupts) and comission biases - so tails may be a bit 
 
 # Other studies
 
-Results depend on return normalisation, so results may be different.
+Results depend on return normalisation, so may be different.
 
 **Study1**: [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf)
 , one of authors is Laurens de Haan, pioneer of EVT and inventor of one of the best estimators
@@ -75,20 +75,8 @@ step=period), each cohort shifts initial position by +30.
 
 # Questions
 
-I used approach different from standard EVT POT GPD. The standard approaches
-have problems MLE - huge bias and variance, HILL - very sensitive to threshold
-parameter and even then has bias, DEDH - the best, but still has some bias. I found combining
-DEDH-HILL gives the best result. And the threshold choosen differently, assuming that log return
-tails are somewhat similar to StudenT tails, the optimal threshold found by simulation.
-I think it's the best approach, more precise than standard EVT. It's described
-in [Tail Estimator](/tail-estimator) experiment. The standard DEDH method would produce slightly
-worst results.
-
-I think the **tail exponent resistant to aggregation** and so should be the same for 1d,
-30d, 365d log returns. Mathematically it is so `Pr(X>x) ~ Cx^-ν`, ν doesn't depend on
-aggregation.  The empirical estimation shows different story - tail exponent is growing with
-the period, but I believe it's a random artefact, because there's much less data for
-larger periods, and in reality tail exponent is the same.
+I used unusual estimator [Tail Estimator](/tail-estimator) that in my opinion is much better and
+apply normalisation by volatility and choose tail threshold differently.
 
 My data is biased, no bankrupts, if you have access to full market unbiased data,
 **let me know** please, I would be interested to analyse it.
@@ -97,7 +85,5 @@ If you find errors or know a better way, let me know please.
 
 # TODO
 
-- Decluster 1d data - across same stock within 30 days, and across multiple stocks - only
-  single stock maxima per same day.
 - In order to avoid submission bias - estimate tail for each stock individually and analyse it.
 - Calculate credible intervals.
