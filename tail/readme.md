@@ -88,7 +88,7 @@ If you find errors or know a better way, let me know please.
 - In order to avoid submission bias - estimate tail for each stock individually and analyse it.
 - Calculate credible intervals.
 
-### Tails of normalised log returns
+### Tails, normalised
 
 1d tails on chart start with lower probability because 1d has more data and higher treshold
 quantile.
@@ -125,7 +125,7 @@ Right Tail (Norm) by periods
    3 │     60      3.9      3.9
 ```
 
-### Tails by Vol
+### Tails by Vol, normalised
 
 Left Tail by Vol (Norm) raw x=survx, y=survy, color=nvol_dc(cohort), dashed=survy_m by=period
 
@@ -138,17 +138,16 @@ Left Tail by Vol (Norm) x=survxn, y=survy, color=nvol_dc(cohort), dashed=survy_m
 Left Tail by Vol (Norm) table
 
 ```
-3×2 DataFrame
+2×2 DataFrame
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
    1 │      1      3.1
    2 │     30      4.1
-   3 │     60      5.5
 ```
 
 ```
-40×5 DataFrame
+20×5 DataFrame
  Row │ period  cohort  nvol_dc  tail_k  ν
      │ Int64   Int64   Int64?   Int64   Float64
 ─────┼──────────────────────────────────────────
@@ -172,26 +171,6 @@ Left Tail by Vol (Norm) table
   18 │     30       0        8     236      4.0
   19 │     30       0        9     234      6.9
   20 │     30       0       10     213      6.9
-  21 │     60       0        1     113      3.2
-  22 │     60       0        2     119      7.0
-  23 │     60       0        3     119      3.5
-  24 │     60       0        4     118      3.7
-  25 │     60       0        5     118      6.8
-  26 │     60       0        6     117      6.6
-  27 │     60       0        7     115      6.9
-  28 │     60       0        8     117      5.5
-  29 │     60       0        9     116      7.1
-  30 │     60       0       10     112      6.8
-  31 │     60       1        1     115      5.3
-  32 │     60       1        2     118      3.7
-  33 │     60       1        3     118      4.5
-  34 │     60       1        4     118      4.3
-  35 │     60       1        5     117      6.7
-  36 │     60       1        6     115      4.8
-  37 │     60       1        7     119      6.2
-  38 │     60       1        8     117      5.1
-  39 │     60       1        9     117      5.6
-  40 │     60       1       10     110      5.6
 ```
 
 Right Tail by Vol (Norm) raw x=survx, y=survy, color=nvol_dc(cohort), dashed=survy_m by=period
@@ -205,17 +184,16 @@ Right Tail by Vol (Norm) x=survxn, y=survy, color=nvol_dc(cohort), dashed=survy_
 Right Tail by Vol (Norm) table
 
 ```
-3×2 DataFrame
+2×2 DataFrame
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
    1 │      1      3.7
    2 │     30      6.0
-   3 │     60      5.2
 ```
 
 ```
-40×5 DataFrame
+20×5 DataFrame
  Row │ period  cohort  nvol_dc  tail_k  ν
      │ Int64   Int64   Int64?   Int64   Float64
 ─────┼──────────────────────────────────────────
@@ -239,29 +217,9 @@ Right Tail by Vol (Norm) table
   18 │     30       0        8     237      6.5
   19 │     30       0        9     233      7.5
   20 │     30       0       10     228      7.1
-  21 │     60       0        1     108      4.0
-  22 │     60       0        2     117      4.1
-  23 │     60       0        3     118      6.1
-  24 │     60       0        4     116      7.5
-  25 │     60       0        5     116      5.1
-  26 │     60       0        6     118      5.1
-  27 │     60       0        7     117      7.9
-  28 │     60       0        8     118      4.8
-  29 │     60       0        9     112      3.7
-  30 │     60       0       10     111      7.2
-  31 │     60       1        1     104      3.5
-  32 │     60       1        2     118      5.4
-  33 │     60       1        3     117      6.9
-  34 │     60       1        4     116      4.3
-  35 │     60       1        5     115      4.4
-  36 │     60       1        6     114      5.2
-  37 │     60       1        7     118      7.8
-  38 │     60       1        8     117      7.2
-  39 │     60       1        9     117      4.6
-  40 │     60       1       10     114      7.8
 ```
 
-### Tails by RSI
+### Tails by RSI, normalised
 
 Left Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
 
@@ -274,17 +232,16 @@ Left Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m 
 Left Tail by RSI (Norm) table
 
 ```
-3×2 DataFrame
+2×2 DataFrame
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
    1 │      1      3.0
    2 │     30      3.9
-   3 │     60      4.2
 ```
 
 ```
-40×5 DataFrame
+20×5 DataFrame
  Row │ period  cohort  rsi_dc  tail_k  ν
      │ Int64   Int64   Int64?  Int64   Float64
 ─────┼─────────────────────────────────────────
@@ -308,26 +265,6 @@ Left Tail by RSI (Norm) table
   18 │     30       0       8     235      2.8
   19 │     30       0       9     237      4.3
   20 │     30       0      10     233      3.9
-  21 │     60       0       1     112      5.6
-  22 │     60       0       2     119      6.9
-  23 │     60       0       3     120      6.7
-  24 │     60       0       4     119      6.6
-  25 │     60       0       5     120      4.9
-  26 │     60       0       6     118      6.6
-  27 │     60       0       7     116      3.3
-  28 │     60       0       8     117      3.9
-  29 │     60       0       9     116      3.2
-  30 │     60       0      10     113      6.5
-  31 │     60       1       1     115      6.6
-  32 │     60       1       2     116      3.5
-  33 │     60       1       3     115      3.9
-  34 │     60       1       4     117      6.4
-  35 │     60       1       5     117      4.0
-  36 │     60       1       6     118      3.5
-  37 │     60       1       7     119      3.2
-  38 │     60       1       8     118      3.4
-  39 │     60       1       9     121      4.4
-  40 │     60       1      10     120      3.5
 ```
 
 Right Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
@@ -341,17 +278,16 @@ Right Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m
 Right Tail by RSI (Norm) table
 
 ```
-3×2 DataFrame
+2×2 DataFrame
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
    1 │      1      3.4
    2 │     30      4.1
-   3 │     60      4.0
 ```
 
 ```
-40×5 DataFrame
+20×5 DataFrame
  Row │ period  cohort  rsi_dc  tail_k  ν
      │ Int64   Int64   Int64?  Int64   Float64
 ─────┼─────────────────────────────────────────
@@ -375,83 +311,7 @@ Right Tail by RSI (Norm) table
   18 │     30       0       8     233      4.0
   19 │     30       0       9     233      4.2
   20 │     30       0      10     229      4.2
-  21 │     60       0       1     117      3.5
-  22 │     60       0       2     120      3.2
-  23 │     60       0       3     119      3.5
-  24 │     60       0       4     117      7.8
-  25 │     60       0       5     119      4.1
-  26 │     60       0       6     116      3.8
-  27 │     60       0       7     117      7.4
-  28 │     60       0       8     117      3.2
-  29 │     60       0       9     115      5.7
-  30 │     60       0      10     107      4.7
-  31 │     60       1       1     117      3.6
-  32 │     60       1       2     116      3.9
-  33 │     60       1       3     115      3.5
-  34 │     60       1       4     117      4.3
-  35 │     60       1       5     117      7.5
-  36 │     60       1       6     117      4.1
-  37 │     60       1       7     119      3.3
-  38 │     60       1       8     118      4.8
-  39 │     60       1       9     120      4.8
-  40 │     60       1      10     116      3.9
 ```
 
-### Estimating tail by volatility and risk free rate
-
-Left Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc
-
-![Left Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc](readme/left-tail-by-vol-rf-norm-s-x-lr-rf-medn-y-color-nvol-dc.png)
-
-Right Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc
-
-![Right Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc](readme/right-tail-by-vol-rf-norm-s-x-lr-rf-medn-y-color-nvol-dc.png)
-
-### Tails for all periods.
-
-Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
-
-![Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
-
-Left Tail all Periods (Norm) by periods
-
-```
-8×3 DataFrame
- Row │ period  ν        ν_model
-     │ Int64   Float64  Float64
-─────┼──────────────────────────
-   1 │      1      2.7      2.7
-   2 │     30      3.5      3.5
-   3 │     60      4.1      3.7
-   4 │     91      6.4      3.8
-   5 │    182      6.8      3.9
-   6 │    365      6.8      4.1
-   7 │    730      6.3      4.3
-   8 │   1095      5.4      4.3
-```
-
-Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
-
-![Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
-
-Right Tail all Periods (Norm) by periods
-
-```
-8×3 DataFrame
- Row │ period  ν        ν_model
-     │ Int64   Float64  Float64
-─────┼──────────────────────────
-   1 │      1      2.9      2.9
-   2 │     30      3.7      3.7
-   3 │     60      3.9      3.9
-   4 │     91      3.8      4.0
-   5 │    182      4.4      4.1
-   6 │    365      5.1      4.3
-   7 │    730      6.8      4.5
-   8 │   1095      7.2      4.5
-```
-
-Tails by periods x=period, y=ν, color=type, dashed=ν_model
-
-![Tails by periods x=period, y=ν, color=type, dashed=ν_model](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
+### Tails by Vol and RF rate, normalised
 

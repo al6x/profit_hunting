@@ -213,7 +213,7 @@ Report.clear()
 report(read("$(@__DIR__)/readme.t.md", String))
 
 report("""
-  # Tails of normalised log returns
+  # Tails, normalised
 
   1d tails on chart start with lower probability because 1d has more data and higher treshold
   quantile.
@@ -240,23 +240,23 @@ group_by_period_cohort_key(op, ds, key) = begin
 end;
 
 c_tail_by_key(calc, name, ds, key) = begin
-  by_key = group_by_period_cohort_key(calc, ds, key)
+  r = group_by_period_cohort_key(calc, ds, key)
 
   plot_xyc_by(
-    "$name raw", by_key;
+    "$name raw", r;
     x="survx", y="survy", y2="survy_m", color=key, by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(3, 100), ydomain=(2e-6, 0.015)
   );
 
   plot_xyc_by(
-    name, by_key;
+    name, r;
     x="survxn", y="survy", y2="survy_m", color=key, by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-6, 0.015)
   );
 
-  νs = by_key[:, [:period, :cohort, key, :ν]]
+  νs = r[r.period .<= 30, [:period, :cohort, key, :ν]]
   νs = combine(groupby(νs, [:period, :cohort, key]),
     :ν => length => :tail_k, :ν => first => :ν
   );
@@ -274,7 +274,7 @@ c_tail_by_key(calc, name, ds, key) = begin
 end;
 
 # Tails by vol_dc ----------------------------------------------------------------------------------
-report("# Tails by Vol");
+report("# Tails by Vol, normalised");
 
 c_tail_by_key("Left Tail by Vol (Norm)", ds[ds.period .<= 60, :], :nvol_dc) do g, _, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
@@ -288,7 +288,7 @@ end
 
 
 # Tails by rsi_dc ----------------------------------------------------------------------------------
-report("# Tails by RSI");
+report("# Tails by RSI, normalised");
 
 c_tail_by_key("Left Tail by RSI (Norm)", ds[ds.period .<= 60, :], :rsi_dc) do g, _, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
@@ -330,7 +330,7 @@ c_tail_by_vol_rf(calc, name, ds) = begin
   );
 end;
 
-report("# Estimating tail by volatility and risk free rate")
+report("# Tails by Vol and RF rate, normalised")
 
 c_tail_by_vol_rf("Left Tail by Vol, RF (Norm)", ds[ds.period .== 1, :]) do g
   tq, u, tail = get_and_normalise_tail(g; left=true)
@@ -343,7 +343,7 @@ c_tail_by_vol_rf("Right Tail by Vol, RF (Norm)", ds[ds.period .== 1, :]) do g
 end;
 
 # Tails for all periods ----------------------------------------------------------------------------
-report("# Tails for all periods.");
+report("# Tails for all periods, normalised");
 
 let
   ltail = c_tail("Left Tail all Periods (Norm)", ds, ν_l_model) do g, _, _
