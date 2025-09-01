@@ -315,3 +315,59 @@ Right Tail by RSI (Norm) table
 
 ### Tails by Vol and RF rate, normalised
 
+Left Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc
+
+![Left Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc](readme/left-tail-by-vol-rf-norm-s-x-lr-rf-medn-y-color-nvol-dc.png)
+
+Right Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc
+
+![Right Tail by Vol, RF (Norm) νs x=lr_rf_medn, y=ν, color=nvol_dc](readme/right-tail-by-vol-rf-norm-s-x-lr-rf-medn-y-color-nvol-dc.png)
+
+### Tails for all periods, normalised
+
+Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+
+![Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+
+Left Tail all Periods (Norm) by periods
+
+```
+8×3 DataFrame
+ Row │ period  ν        ν_model
+     │ Int64   Float64  Float64
+─────┼──────────────────────────
+   1 │      1      2.7      2.7
+   2 │     30      3.5      3.5
+   3 │     60      4.1      3.7
+   4 │     91      6.4      3.8
+   5 │    182      6.8      3.9
+   6 │    365      6.8      4.1
+   7 │    730      6.3      4.3
+   8 │   1095      5.4      4.3
+```
+
+Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+
+![Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+
+Right Tail all Periods (Norm) by periods
+
+```
+8×3 DataFrame
+ Row │ period  ν        ν_model
+     │ Int64   Float64  Float64
+─────┼──────────────────────────
+   1 │      1      2.9      2.9
+   2 │     30      3.7      3.7
+   3 │     60      3.9      3.9
+   4 │     91      3.8      4.0
+   5 │    182      4.4      4.1
+   6 │    365      5.1      4.3
+   7 │    730      6.8      4.5
+   8 │   1095      7.2      4.5
+```
+
+Tails by periods x=period, y=ν, color=type, dashed=ν_model
+
+![Tails by periods x=period, y=ν, color=type, dashed=ν_model](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
+
