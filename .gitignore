@@ -1,0 +1,9 @@
+.DS_Store
+tmp
+build
+/node_modules
+bun.lockb
+__pycache__
+tmp.md
+.vscode
+/hist_data/*.zip
