@@ -106,7 +106,7 @@ Left Tail (Norm) by periods
 ─────┼──────────────────────────
    1 │      1      3.0      3.0
    2 │     30      3.8      3.8
-   3 │     60      5.1      4.0
+   3 │     60      4.8      4.0
 ```
 
 Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
@@ -122,7 +122,7 @@ Right Tail (Norm) by periods
 ─────┼──────────────────────────
    1 │      1      3.1      3.1
    2 │     30      4.7      4.7
-   3 │     60      4.8      5.0
+   3 │     60      4.7      5.0
 ```
 
 ### Tails by Vol, normalised
@@ -142,8 +142,8 @@ Left Tail by Vol (Norm) table
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
-   1 │      1      3.1
-   2 │     30      4.0
+   1 │      1      3.0
+   2 │     30      3.9
 ```
 
 ```
@@ -188,8 +188,8 @@ Right Tail by Vol (Norm) table
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
-   1 │      1      3.7
-   2 │     30      6.8
+   1 │      1      3.5
+   2 │     30      4.7
 ```
 
 ```
@@ -236,8 +236,8 @@ Left Tail by RSI (Norm) table
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
-   1 │      1      3.1
-   2 │     30      4.2
+   1 │      1      3.0
+   2 │     30      3.5
 ```
 
 ```
@@ -282,8 +282,8 @@ Right Tail by RSI (Norm) table
  Row │ period  ν
      │ Int64   Float64
 ─────┼─────────────────
-   1 │      1      3.5
-   2 │     30      5.9
+   1 │      1      3.4
+   2 │     30      4.3
 ```
 
 ```
@@ -338,12 +338,12 @@ Left Tail all Periods (Norm) by periods
 ─────┼──────────────────────────
    1 │      1      3.0      3.0
    2 │     30      3.8      3.8
-   3 │     60      5.1      4.0
+   3 │     60      4.8      4.0
    4 │     91      6.7      4.1
-   5 │    182      6.8      4.2
-   6 │    365      6.8      4.4
-   7 │    730      6.5      4.6
-   8 │   1095      5.4      4.6
+   5 │    182      6.5      4.2
+   6 │    365      6.6      4.4
+   7 │    730      5.3      4.6
+   8 │   1095      4.5      4.6
 ```
 
 Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
@@ -359,12 +359,12 @@ Right Tail all Periods (Norm) by periods
 ─────┼──────────────────────────
    1 │      1      3.1      3.1
    2 │     30      4.7      4.7
-   3 │     60      4.8      5.0
-   4 │     91      4.7      5.2
-   5 │    182      5.6      5.5
-   6 │    365      6.8      5.9
-   7 │    730      7.1      6.2
-   8 │   1095      7.3      6.4
+   3 │     60      4.7      5.0
+   4 │     91      4.5      5.2
+   5 │    182      5.1      5.5
+   6 │    365      5.8      5.9
+   7 │    730      6.0      6.2
+   8 │   1095      7.2      6.4
 ```
 
 Tails by periods x=period, y=ν, color=type, dashed=ν_model

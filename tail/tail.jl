@@ -82,6 +82,7 @@ optimal_tail_quantile(n) = max(0.985, 1 - 1000/n); # n > 100_000 ? 0.995 : 0.985
 # external expert opinion.
 ν_l_model(t) = 3.0 + 0.2352log(t);
 ν_r_model(t) = 3.1 + 0.4705log(t);
+v_model(t)   = 3.05 + 0.3529log(t);
 
 empir_surv(x) = begin
   # Collapsing duplicates for better plot
@@ -195,7 +196,7 @@ c_tail(calc, name, ds, ν_model) = begin
     :ν => length => :tail_k, :ν => first => :ν
   );
 
-  total = combine(groupby(νs, [:period]), :ν => median => :ν);
+  total = combine(groupby(νs, [:period]), :ν => (x -> quantile(x, 0.25)) => :ν);
   total.ν = round.(total.ν, digits=1);
   total.ν_model = round.(ν_model.(total.period), digits=1);
   total_s = sprint(print, total);
@@ -267,7 +268,7 @@ c_tail_by_key(calc, name, ds, key) = begin
     :ν => length => :tail_k, :ν => first => :ν
   );
 
-  total = combine(groupby(νs, [:period]), :ν => median => :ν);
+  total = combine(groupby(νs, [:period]), :ν => (x -> quantile(x, 0.25)) => :ν);
   total.ν = round.(total.ν, digits=1);
   total_s = sprint(print, total);
 
@@ -362,9 +363,13 @@ let
     calc_tail(tail; u, tq)
   end;
 
+  both = DataFrame(
+    period=ltail.period, ν_model=v_model.(ltail.period), type="both", ν=missing
+  )
+
   ltail.type .= "left"
   rtail.type .= "right"
-  lrtail = vcat(ltail, rtail)
+  lrtail = vcat(ltail, rtail, both)
 
   plot_xyc_by(
     "Tails by periods", lrtail; mark=:line_with_points,
