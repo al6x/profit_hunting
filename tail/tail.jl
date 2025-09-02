@@ -13,60 +13,66 @@ assign_quantiles!(ds, name) = begin
 
   ds[!, "$(name)_q"] = q
   ds[!, "$(name)_dc"] = min.(floor.(Int, q .* 10) .+ 1, 10)
-  ds[!, "$(name)_g5"] = min.(floor.(Int, q .* 5) .+ 1, 5)
+  ds[!, "$(name)_q5"] = min.(floor.(Int, q .* 5) .+ 1, 5)
   ds
 end;
 
 prepare_data_daily() = begin
   ds = cached("distr-prepare-data-daily") do
-    df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv.zip")
+    df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
 
   ds.period = ds.period_d
   ds.lr = ds.lr_t2
   ds.lr_rf = ds.lr_rf_1y_t
-  ds.hvol = ds.hscale_d_t
   ds.rsi = (ds.scalep_d_t .+ 1e-6) ./ (ds.scalen_d_t .+ 1e-6)
   ds
 end;
 
 prepare_data_periods() = begin
   ds = cached("distr-prepare-data-periods") do
-    df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv.zip")
+    df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
 
   ds.period = ds.period_d
   ds.lr = ds.lr_t2
   ds.lr_rf = ds.lr_rf_1y_t
-  ds.hvol = ds.hscale_d_t
   ds.rsi = (ds.scalep_d_t .+ 1e-6) ./ (ds.scalen_d_t .+ 1e-6)
   ds
 end;
 
-add_fields(ds) = begin
-  ds = deepcopy(ds)
-  vcat([begin
-    # nvol
-    min_by_sym = Dict(sg.symbol[1] => quantile(sg.hvol, 0.05) for sg in groupby(g, :symbol))
-    min_hvol = [min_by_sym[sym] for sym in g.symbol]
-    g.nvol = sqrt.(0.8 .* (g.scale_mad_d_t .^ 2) .+ 0.2 .* (max.(g.hvol, min_hvol) .^ 2))
-    @assert all(g.nvol .> 0)
-
-    assign_quantiles!(g, :vol)
-    assign_quantiles!(g, :hvol)
-    assign_quantiles!(g, :nvol)
-    assign_quantiles!(g, :lr_rf)
-    assign_quantiles!(g, :rsi)
-    g
-  end for g in groupby(ds, :period)]...)
-end;
-
 ds = let
-  fields = [:lr, :vol, :hvol, :rsi, :lr_rf, :symbol, :t, :t2, :period, :cohort, :scale_mad_d_t]
-  ds = vcat(prepare_data_daily()[!, fields], prepare_data_periods()[!, fields])
-  add_fields(ds)
+  add_fields(ds) = begin
+    ds = deepcopy(ds)
+    vcat([begin
+      # vol, average of current and historical
+      min_hvol_by_sym = Dict(
+        sg.symbol[1] => quantile(sg.hscale_mad_d_t, 0.1) for sg in groupby(g, :symbol)
+      )
+      min_hvol = [min_hvol_by_sym[sym] for sym in g.symbol]
+      g.vol = max.(0.8 .* g.scale_mad_d_t .+ 0.2 .* g.hscale_mad_d_t, min_hvol)
+      @assert all(g.vol .> 0)
+
+      assign_quantiles!(g, :vol)
+      assign_quantiles!(g, :lr_rf)
+      assign_quantiles!(g, :rsi)
+      g
+    end for g in groupby(ds, :period)]...)
+  end;
+
+  fields = [
+    :lr, :symbol, :t, :t2, :period, :cohort,
+    :vol, :vol_q, :vol_dc, :vol_q5,
+    :lr_rf, :lr_rf_q, :lr_rf_dc, :lr_rf_q5,
+    :rsi, :rsi_q, :rsi_dc, :rsi_q5,
+  ]
+
+  vcat(
+    add_fields(prepare_data_daily())[!, fields],
+    add_fields(prepare_data_periods())[!, fields]
+  )
 end;
 
 # Optimal tail quantiles from `/tail-estimator`
@@ -130,7 +136,7 @@ get_and_normalise_tail(ds; left) = begin
   x = left ? -ds.lr : ds.lr
 
   # Normalise, should be done before extracting tail
-  x = (x .- mean(x)) ./ ds.nvol
+  x = (x .- mean(x)) ./ ds.vol
   x = mscore(x) # optional
 
   # Tail threshold
@@ -219,6 +225,7 @@ report("""
   quantile.
 """);
 
+Report.clear()
 c_tail("Left Tail (Norm)", ds[ds.period .<= 60, :], ν_l_model) do g, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
   calc_tail(tail; u, tq)
@@ -276,12 +283,12 @@ end;
 # Tails by vol_dc ----------------------------------------------------------------------------------
 report("# Tails by Vol, normalised");
 
-c_tail_by_key("Left Tail by Vol (Norm)", ds[ds.period .<= 60, :], :nvol_dc) do g, _, _, _
+c_tail_by_key("Left Tail by Vol (Norm)", ds[ds.period .<= 60, :], :vol_dc) do g, _, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
   calc_tail(tail; u, tq)
 end;
 
-c_tail_by_key("Right Tail by Vol (Norm)", ds[ds.period .<= 60, :], :nvol_dc) do g, _, _, _
+c_tail_by_key("Right Tail by Vol (Norm)", ds[ds.period .<= 60, :], :vol_dc) do g, _, _, _
   tq, u, tail = get_and_normalise_tail(g; left=false)
   calc_tail(tail; u, tq)
 end
@@ -302,11 +309,11 @@ end
 
 # Tails by vol, rf ---------------------------------------------------------------------------------
 group_by_vol_rf(op, ds) = begin
-  lr_rf_medns = Dict(g.lr_rf_g5[1] => median(g.lr_rf) for g in groupby(ds, :lr_rf_g5))
-  DataFrame(combine(groupby(ds, [:nvol_dc, :lr_rf_g5])) do g
-    nvol_dc, lr_rf_g5 = g.nvol_dc[1], g.lr_rf_g5[1]
-    lr_rf_medn = lr_rf_medns[lr_rf_g5]
-    spread((; nvol_dc, lr_rf_g5, lr_rf_medn, op(g)...))
+  lr_rf_medns = Dict(g.lr_rf_q5[1] => median(g.lr_rf) for g in groupby(ds, :lr_rf_q5))
+  DataFrame(combine(groupby(ds, [:vol_dc, :lr_rf_q5])) do g
+    vol_dc, lr_rf_q5 = g.vol_dc[1], g.lr_rf_q5[1]
+    lr_rf_medn = lr_rf_medns[lr_rf_q5]
+    spread((; vol_dc, lr_rf_q5, lr_rf_medn, op(g)...))
   end)
 end;
 
@@ -315,18 +322,18 @@ c_tail_by_vol_rf(calc, name, ds) = begin
 
   # plot_xyc_by(
   #   name, r;
-  #   x="survxn", y="survy", y2="survy_m", color="nvol_dc", by="lr_rf_g5",
+  #   x="survxn", y="survy", y2="survy_m", color="vol_dc", by="lr_rf_q5",
   #   yscale="log", xscale="log",
   #   xdomain=(0.05, 30), ydomain=(2e-6, 0.015)
   # );
 
-  νs = combine(groupby(r, [:lr_rf_g5, :nvol_dc]),
+  νs = combine(groupby(r, [:lr_rf_q5, :vol_dc]),
     :ν => length => :tail_k, :ν => first => :ν, :lr_rf_medn => first => :lr_rf_medn
   );
 
   νs.ν = round.(νs.ν, digits=1);
   plot_xyc_by(
-    "$name νs" , νs; x="lr_rf_medn", y="ν", color="nvol_dc", ydomain=(2, 6), yscale="log"
+    "$name νs" , νs; x="lr_rf_medn", y="ν", color="vol_dc", ydomain=(2, 6), yscale="log"
   );
 end;
 

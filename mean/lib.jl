@@ -80,7 +80,7 @@ end
 
 function prepare_data_daily()
   ds = cached("distr-prepare-data-daily") do
-    df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv.zip")
+    df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
 
@@ -91,7 +91,10 @@ function prepare_data_daily()
   ds.volg = (ds.vol_dc .+ 1) .÷ 2
 
   # Not really RSI just something to group in RSI like manner
+  error("fix rsi for 1d")
   ds.rsi = ds.lr_t ./ (ds.hscale_d_t .+ 1e-6)
+
+
   assign_quantiles!(ds, :rsi)
 
   ds
@@ -99,7 +102,7 @@ end
 
 function prepare_data()
   ds = cached("distr-prepare-data-periods") do
-    df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv.zip")
+    df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
 

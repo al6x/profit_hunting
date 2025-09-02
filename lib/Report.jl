@@ -50,7 +50,7 @@ function report(msg::AbstractString; print=true, clear=true)
 
   msg = msg |> dedent |> indent2to4 |> replace_h1_with_h3 |> rstrip
 
-  # print && println(space_indent2(msg), "\n")
+  print && println(space_indent2(msg), "\n")
 
   mkpath(dirname(config().report_path))
   open(config().report_path, "a") do io

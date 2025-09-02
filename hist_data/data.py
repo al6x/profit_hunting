@@ -66,9 +66,9 @@ def make_each_year_have_even_counts_of_records(df):
 
   return balanced
 
-def load(fname='hist_data/returns-periods.tsv.zip'):
-  df = pd.read_csv(fname, sep='\t', compression='zip')
-  # df = pd.read_csv(fname, sep='\t')
+def load(fname='hist_data/returns-periods.tsv'):
+  # df = pd.read_csv(fname, sep='\t', compression='zip')
+  df = pd.read_csv(fname, sep='\t')
   add_fields(df)
 
   out = []
@@ -78,9 +78,9 @@ def load(fname='hist_data/returns-periods.tsv.zip'):
     out.append(sub)
   return pd.concat(out, ignore_index=True)
 
-def load_with_bankrupts(fname='hist_data/returns-periods.tsv.zip'):
-  df_all = pd.read_csv(fname, sep='\t', compression='zip')
-  # df_all = pd.read_csv(fname, sep='\t')
+def load_with_bankrupts(fname='hist_data/returns-periods.tsv'):
+  # df_all = pd.read_csv(fname, sep='\t', compression='zip')
+  df_all = pd.read_csv(fname, sep='\t')
   add_fields(df_all)
 
   out, qcols = [], ['vol_q','vol_dc','vol_dc_mian']

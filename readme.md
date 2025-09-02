@@ -11,9 +11,9 @@
 
 ![](option_norm/readme/norm-premium-p-e-r-scale-log-r-norm-strike-p-r-k-vol.png)
 
-[Estimating tails for stock returns](tail)
+[Tails of Stock Returns](tail)
 
-![](/tail/readme/left-tail-by-vol-x-survxn-y-survycolor-vol-dc-cohort-dashed-survy-m-by-period.png)
+![](/tail/readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
 
 [High precision estimator for Tail Exponent, Extreme Value Theory](tail-estimator)
 

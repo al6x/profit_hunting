@@ -1,6 +1,6 @@
 The data 250 stocks, all stocks start from 1972 and end in 2025.
 
-Data stored separately [daily](https://drive.google.com/file/d/1D1J5LLgcQe_7AGKTRS9z6rKK3YUh5ywX/view?usp=sharing), [larger periods](https://drive.google.com/file/d/1jEyQLTObX3v_J85t3eVh21-rg7D5E7aj/view?usp=sharing).
+Data stored separately [link](https://drive.google.com/drive/folders/1LEOh9t2p5BuSNCrs4A0p7FOxeD5RAn0o?usp=sharing).
 
 Data has both comission (large cap) and omission biases (no bankrupts).
 
@@ -16,7 +16,7 @@ Data has both comission (large cap) and omission biases (no bankrupts).
     - lr_t2_max: max possible log return over time T log max(S_0, ..., S_T)/S_0
     - lr_t2_min: min possible log return over time T log min(S_0, ..., S_T)/S_0
 
-    - hscale_d: historical Scale[log r]
+    - hscale_mad_d: historical Scale[log r]
 
     - scale_d_t:  current Scale[log r] as sqrt EMA[(log R)^2]
     - scalep_d_t: positive current Scale[log r] as sqrt EMA[(log R)^2] | log R > 0
