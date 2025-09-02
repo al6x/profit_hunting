@@ -4,8 +4,8 @@ Run `julia tail/tail.jl`.
 
 ### Goal
 
-Estimate left and right tails for stock log returns, for 1d, 30d, 365d periods and volatility
-levels, from historical data.
+Estimate left and right tails for stock log returns, for 1d, 30d, 365d periods, from historical
+data.
 
 Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
