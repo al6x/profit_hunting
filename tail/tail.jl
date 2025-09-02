@@ -80,8 +80,8 @@ optimal_tail_quantile(n) = max(0.985, 1 - 1000/n); # n > 100_000 ? 0.995 : 0.985
 
 # Final model for tail exponent, inferred from results of this experiment and
 # external expert opinion.
-ν_l_model(t) = 2.7 + 0.2352log(t);
-ν_r_model(t) = 2.9 + 0.2352log(t);
+ν_l_model(t) = 3.0 + 0.2352log(t);
+ν_r_model(t) = 3.1 + 0.4705log(t);
 
 empir_surv(x) = begin
   # Collapsing duplicates for better plot
@@ -225,7 +225,6 @@ report("""
   quantile.
 """);
 
-Report.clear()
 c_tail("Left Tail (Norm)", ds[ds.period .<= 60, :], ν_l_model) do g, _, _
   tq, u, tail = get_and_normalise_tail(g; left=true)
   calc_tail(tail; u, tq)
