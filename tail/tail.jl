@@ -171,7 +171,6 @@ calc_tail(tail; u, tq) = begin
   (; survx, survxn, survy, ν, survy_m)
 end;
 
-
 # Tails --------------------------------------------------------------------------------------------
 group_by_period_cohort(op, ds) = begin
   DataFrame(combine(groupby(ds, [:period, :cohort])) do g

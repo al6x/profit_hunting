@@ -4,8 +4,8 @@ Run `julia tail/tail.jl`.
 
 # Goal
 
-Estimate left and right tails for stock log returns for different periods 1d, 30d, 365d periods
-and volatility levels, from historical data.
+Estimate left and right tails for stock log returns, for 1d, 30d, 365d periods and volatility
+levels, from historical data.
 
 Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
@@ -13,15 +13,10 @@ Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
 ![](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
 
-Data has 3.4m days. Reliable estimation require 10k sample size or <340d periods, rough
-estimation 5k or <680d. And if grouped by 10 volatility levels <34d and for 5 vol levels <68d.
+Results depends on how returns normalised, varying 2.7-3.2.
 
-**1d: ν_l=2.7, ν_r=2.9**, normalised returns. It depends how returns
-normalised, varying 2.7-3.2.
-
-For larger periods: **30d: ν_l=3.5, ν_r=3.7**. Note 30d has x30 less data than 1d returns,
-still it should be enough to estimate the tail. Periods >=60d less realiable, they have much
-less data, and maybe the data bias more prominent.
+Note 30d has x30 less data than 1d returns, still it should be enough to estimate the tail.
+Periods >=60d less realiable, they have much less data, and maybe the data bias more prominent.
 
 Mathematically the exponent should be resistant to aggregation `Pr(X>x|for large x) ~ Cx^-ν`, but
 it may not be true for a) if x sampled from differrent distributions and b) pre asymptotic
@@ -30,11 +25,9 @@ c) bounded x.
 In my opinion larger periods follow `ν = a + b log T`, solving it for 1d and 30d:
 
 ```
-ν_l(t) = 2.7 + 0.2352log(t)
-ν_r(t) = 2.9 + 0.2352log(t)
+ν_l_model(t) = 3.0 + 0.2352log(t);
+ν_r_model(t) = 3.1 + 0.4705log(t);
 ```
-
-Data has both omission (bankrupts) and comission biases - so tails may be a bit wrong.
 
 # Methodology
 
@@ -46,6 +39,11 @@ Data has both omission (bankrupts) and comission biases - so tails may be a bit 
   larger windows for longer periods.
 - Allow clusters across stocks - when many stock drop on same day.
 - EVT POT GPD approach with [DEDH-HILL](/tail-estimator) estimator.
+
+Data has 3.4m days. Reliable estimation require 10k sample size or <340d periods, rough
+estimation 5k or <680d. And if grouped by 10 volatility levels <34d and for 5 vol levels <68d.
+
+Data has both omission (bankrupts) and comission biases - so tails may be a bit wrong.
 
 # Other studies
 
