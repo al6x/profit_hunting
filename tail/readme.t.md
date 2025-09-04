@@ -13,8 +13,6 @@ Normal US NYSE+NASDAQ stock only, no penny stock like AMEX or OTC.
 
 ![](readme/tails-by-periods-x-period-y-color-type-dashed-model.png)
 
-Results depends on how returns normalised, varying 2.7-3.2.
-
 Note 30d has x30 less data than 1d returns, still it should be enough to estimate the tail.
 Periods >=60d less realiable, they have much less data, and maybe the data bias more prominent.
 
@@ -31,10 +29,11 @@ In my opinion larger periods follow `ν = a + b log T`, solving it for 1d and 30
 
 # Methodology
 
-- Historical log returns `log r_t2 = log S_t/S_t2` for `t in [1d, 30d, ..., 1095d]`.
-- Volatility `nvol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
-  `EMA[MAD[log r]]*sqrt(pi/2)` and historical `MAD[log r]*sqrt(pi/2)` over long period.
-- Normalise log returns as `log r_t2 / nvol_t`, each return individually.
+- Historical log returns `log r_t2 = log S_t2/S_t` for `t in [1d, 30d, ..., 1095d]`.
+- Volatility `vol_t = 0.8 current_vol_t + 0.2 historical_vol`, where current over recent period
+  `EMA[MeanAbsDev[log r]]*sqrt(pi/2)` and historical `MeanAbsDev[log r]*sqrt(pi/2)` over long
+  period.
+- Normalise log returns as `log(r_t2) / vol_t`, each return individually.
 - Decluster per stock, allow no more than 1 tail event within window = 30d for 1d returns and
   larger windows for longer periods.
 - Allow clusters across stocks - when many stock drop on same day.
@@ -47,7 +46,7 @@ Data has both omission (bankrupts) and comission biases - so tails may be a bit 
 
 # Other studies
 
-Results depend on return normalisation, so may be different.
+Results may depend on return normalisation, so may be different.
 
 **Study1**: [Tail Index Estimation: QuantileDriven Threshold Selection](https://www.bankofcanada.ca/wp-content/uploads/2019/08/swp2019-28.pdf)
 , one of authors is Laurens de Haan, pioneer of EVT and inventor of one of the best estimators
@@ -73,7 +72,7 @@ step=period), each cohort shifts initial position by +30.
 
 # Questions
 
-I used unusual estimator [Tail Estimator](/tail-estimator) that in my opinion is much better and
+I used unusual [Tail Estimator](/tail-estimator) that in my opinion is much better and
 apply normalisation by volatility and choose tail threshold differently.
 
 My data is biased, no bankrupts, if you have access to full market unbiased data,
