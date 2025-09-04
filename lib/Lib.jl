@@ -30,12 +30,13 @@ dedent(s::AbstractString) = begin
   return join([l[min_indent+1:end] for l in lines], "\n")
 end
 
-function unzip(rows)
-  rows = collect(rows)
+unzip(rows::AbstractVector{T}) where {T<:Union{Tuple,AbstractVector}} = begin
   isempty(rows) && error("empty input")
-  n = length(rows[1])
-  ntuple(j -> getindex.(rows, j), n)
+  N = length(first(rows))
+  return ntuple(j -> getindex.(rows, j), N)
 end
+
+unzip(rows::Base.Generator) = unzip(collect(rows))
 
 flatten(v::AbstractVector{<:AbstractVector{T}}) where {T} = collect(Iterators.flatten(v))
 
