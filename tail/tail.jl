@@ -259,7 +259,7 @@ c_tail_by_key(calc, name, ds, key) = begin
     "$name raw", r;
     x="survx", y="survy", y2="survy_m", color=key, by="period", detail="cohort",
     yscale="log", xscale="log",
-    xdomain=(3, 100), ydomain=(2e-6, 0.015)
+    xdomain=(1, 100), ydomain=(2e-6, 0.015)
   );
 
   plot_xyc_by(
