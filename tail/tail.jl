@@ -191,7 +191,7 @@ c_tail(calc, name, ds, ν_model) = begin
   );
 
   plot_xyc_by(
-    name, r; mark=:line_with_points,
+    "$name exceedances", r; mark=:line_with_points,
     x="survxn", y="survy", y2="survy_m", by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-7, 0.015)
@@ -263,7 +263,7 @@ c_tail_by_key(calc, name, ds, key) = begin
   );
 
   plot_xyc_by(
-    name, r;
+    "$name exceedances", r;
     x="survxn", y="survy", y2="survy_m", color=key, by="period", detail="cohort",
     yscale="log", xscale="log",
     xdomain=(0.05, 30), ydomain=(2e-6, 0.015)

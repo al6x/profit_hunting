@@ -94,9 +94,9 @@ Left Tail (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period
 
 ![Left Tail (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-norm-x-survx-y-survy-cohort-dashed-survy-m-by-period.png)
 
-Left Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+Left Tail (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-![Left Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+![Left Tail (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-norm-exceedances-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
 Left Tail (Norm) by periods
 
@@ -114,9 +114,9 @@ Right Tail (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period
 
 ![Right Tail (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-norm-x-survx-y-survy-cohort-dashed-survy-m-by-period.png)
 
-Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+Right Tail (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-![Right Tail (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+![Right Tail (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-norm-exceedances-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
 Right Tail (Norm) by periods
 
@@ -136,9 +136,9 @@ Left Tail by Vol (Norm) raw x=survx, y=survy, color=vol_dc(cohort), dashed=survy
 
 ![Left Tail by Vol (Norm) raw x=survx, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-vol-norm-raw-x-survx-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
 
-Left Tail by Vol (Norm) x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period
+Left Tail by Vol (Norm) exceedances x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period
 
-![Left Tail by Vol (Norm) x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-vol-norm-x-survxn-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
+![Left Tail by Vol (Norm) exceedances x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-vol-norm-exceedances-x-survxn-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
 
 Left Tail by Vol (Norm) table
 
@@ -182,9 +182,9 @@ Right Tail by Vol (Norm) raw x=survx, y=survy, color=vol_dc(cohort), dashed=surv
 
 ![Right Tail by Vol (Norm) raw x=survx, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-vol-norm-raw-x-survx-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
 
-Right Tail by Vol (Norm) x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period
+Right Tail by Vol (Norm) exceedances x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period
 
-![Right Tail by Vol (Norm) x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-vol-norm-x-survxn-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
+![Right Tail by Vol (Norm) exceedances x=survxn, y=survy, color=vol_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-vol-norm-exceedances-x-survxn-y-survy-color-vol-dc-cohort-dashed-survy-m-by-period.png)
 
 Right Tail by Vol (Norm) table
 
@@ -230,9 +230,9 @@ Left Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=survy
 
 ![Left Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-rsi-norm-raw-x-survx-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
 
-Left Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
+Left Tail by RSI (Norm) exceedances x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
 
-![Left Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-rsi-norm-x-survxn-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
+![Left Tail by RSI (Norm) exceedances x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/left-tail-by-rsi-norm-exceedances-x-survxn-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
 
 Left Tail by RSI (Norm) table
 
@@ -276,9 +276,9 @@ Right Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=surv
 
 ![Right Tail by RSI (Norm) raw x=survx, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-rsi-norm-raw-x-survx-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
 
-Right Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
+Right Tail by RSI (Norm) exceedances x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period
 
-![Right Tail by RSI (Norm) x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-rsi-norm-x-survxn-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
+![Right Tail by RSI (Norm) exceedances x=survxn, y=survy, color=rsi_dc(cohort), dashed=survy_m by=period](readme/right-tail-by-rsi-norm-exceedances-x-survxn-y-survy-color-rsi-dc-cohort-dashed-survy-m-by-period.png)
 
 Right Tail by RSI (Norm) table
 
@@ -334,9 +334,9 @@ Left Tail all Periods (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period
 
 ![Left Tail all Periods (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-x-survx-y-survy-cohort-dashed-survy-m-by-period.png)
 
-Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+Left Tail all Periods (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-![Left Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+![Left Tail all Periods (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/left-tail-all-periods-norm-exceedances-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
 Left Tail all Periods (Norm) by periods
 
@@ -359,9 +359,9 @@ Right Tail all Periods (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period
 
 ![Right Tail all Periods (Norm) x=survx, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-x-survx-y-survy-cohort-dashed-survy-m-by-period.png)
 
-Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period
+Right Tail all Periods (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period
 
-![Right Tail all Periods (Norm) x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
+![Right Tail all Periods (Norm) exceedances x=survxn, y=survy(cohort), dashed=survy_m by=period](readme/right-tail-all-periods-norm-exceedances-x-survxn-y-survy-cohort-dashed-survy-m-by-period.png)
 
 Right Tail all Periods (Norm) by periods
 
