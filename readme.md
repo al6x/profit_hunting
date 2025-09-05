@@ -21,6 +21,7 @@
 
 ### TODO
 
+- Model volatility as log vol
 - update pycall -> pythoncall
 - Baker’s generalised asymmetric-t (GAT)
 - AST — Asymmetric Student-t (Zhu & Galbraith, 2010).

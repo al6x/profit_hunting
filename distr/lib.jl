@@ -51,66 +51,82 @@ function group_by_rf(ds, op; rfg=:rfg)
   DataFrame(rows)
 end
 
-function assign_rf_quantiles!(ds)
-  ranks = ordinalrank(ds.lr_rf)
-  q = (ranks .- 1) ./ (length(ds.lr_rf) - 1)
+# function assign_rf_quantiles!(ds)
+#   ranks = ordinalrank(ds.lr_rf)
+#   q = (ranks .- 1) ./ (length(ds.lr_rf) - 1)
 
-  ds.rf_q = q
-  ds.rf_dc = min.(floor.(Int, q .* 10) .+ 1, 10)
-  ds.rf_g5 = min.(floor.(Int, q .* 5) .+ 1, 5)
-  ds.rf_g4 = min.(floor.(Int, q .* 4) .+ 1, 4)
-  ds.rf_g3 = min.(floor.(Int, q .* 3) .+ 1, 3)
-  ds.rfg = ds.rf_g5 #min.(floor.(q .* 5) .+ 1, 5)
-  ds
-end
+#   ds.rf_q = q
+#   ds.rf_dc = min.(floor.(Int, q .* 10) .+ 1, 10)
+#   ds.rf_g5 = min.(floor.(Int, q .* 5) .+ 1, 5)
+#   ds.rf_g4 = min.(floor.(Int, q .* 4) .+ 1, 4)
+#   ds.rf_g3 = min.(floor.(Int, q .* 3) .+ 1, 3)
+#   ds.rfg = ds.rf_g5 #min.(floor.(q .* 5) .+ 1, 5)
+#   ds
+# end
 
-function assign_quantiles!(ds, name)
+assign_quantiles!(ds, name) = begin
   ranks = ordinalrank(ds[!, name])
   q = (ranks .- 1) ./ (length(ds[!, name]) - 1)
 
   ds[!, "$(name)_q"] = q
   ds[!, "$(name)_dc"] = min.(floor.(Int, q .* 10) .+ 1, 10)
+  ds[!, "$(name)_q5"] = min.(floor.(Int, q .* 5) .+ 1, 5)
   ds
-end
+end;
 
-function prepare_data_daily()
+prepare_data_daily() = begin
   ds = cached("distr-prepare-data-daily") do
     df = pyimport("hist_data.data").load("hist_data/returns-daily.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
-
-  ds.period = ds.period_d
-  ds.lr = ds.lr_t2
-  ds.lr_rf = ds.lr_rf_1y_t
-  assign_rf_quantiles!(ds)
-  ds.volg = (ds.vol_dc .+ 1) .÷ 2
-
-  # Not really RSI just something to group in RSI like manner
-  error("fix rsi for 1d")
-  ds.rsi = ds.lr_t ./ (ds.hscale_d_t .+ 1e-6)
-
-
-  assign_quantiles!(ds, :rsi)
-
+  ds.period_d = 1
   ds
 end
 
-function prepare_data()
-  ds = cached("distr-prepare-data-periods") do
+prepare_data_periods() = begin
+  cached("distr-prepare-data-periods") do
     df = pyimport("hist_data.data").load("hist_data/returns-periods.tsv")
     DataFrame(df.reset_index(drop=true).to_dict(orient="list"))
   end
+end
 
-  ds.period = ds.period_d
-  ds.lr = ds.lr_t2
-  ds.lr_rf = ds.lr_rf_1y_t
-  assign_rf_quantiles!(ds)
-  ds.volg = (ds.vol_dc .+ 1) .÷ 2
+prepare_data() = begin
+  add_fields(ds) = begin
+    ds = deepcopy(ds)
+    vcat([begin
+      ds.period = ds.period_d
+      ds.lr = ds.lr_t2
 
-  ds.rsi = (ds.scalep_d_t .+ 1e-6) ./ (ds.scalen_d_t .+ 1e-6)
-  assign_quantiles!(ds, :rsi)
+      # vol, average of current and historical
+      min_hvol_by_sym = Dict(
+        sg.symbol[1] => quantile(sg.hscale_mad_d_t, 0.1) for sg in groupby(g, :symbol)
+      )
+      min_hvol = [min_hvol_by_sym[sym] for sym in g.symbol]
+      g.vol = max.(0.8 .* g.scale_mad_d_t .+ 0.2 .* g.hscale_mad_d_t, min_hvol)
+      @assert all(g.vol .> 0)
+      assign_quantiles!(g, :vol)
 
-  ds
+      ds.lr_rf = ds.lr_rf_1y_t
+      assign_quantiles!(g, :lr_rf)
+
+      ds.rsi = (ds.scalep_d_t .+ 1e-6) ./ (ds.scalen_d_t .+ 1e-6)
+      assign_quantiles!(g, :rsi)
+
+      g
+    end for g in groupby(ds, :period)]...)
+  end;
+
+  fields = [
+    :lr, :symbol, :t, :t2, :period, :cohort,
+    :vol, :vol_q, :vol_dc, :vol_q5,
+    :lr_rf, :lr_rf_q, :lr_rf_dc, :lr_rf_q5,
+    :rsi, :rsi_q, :rsi_dc, :rsi_q5,
+  ]
+
+  vcat(
+    add_fields(prepare_data_daily())[!, fields],
+    add_fields(prepare_data_periods())[!, fields]
+  )
 end
 
 function adjust_data_lr!(ds)

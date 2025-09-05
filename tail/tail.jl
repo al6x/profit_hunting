@@ -369,13 +369,14 @@ let
     calc_tail(tail; u, tq)
   end;
 
-  both = DataFrame(
-    period=ltail.period, ν_model=v_model.(ltail.period), type="both", ν=missing
-  )
+  # lr_avg = DataFrame(
+  #   period=ltail.period, ν_model=v_model.(ltail.period), type="average", ν=missing
+  # )
 
   ltail.type .= "left"
   rtail.type .= "right"
-  lrtail = vcat(ltail, rtail, both)
+  # lrtail = vcat(ltail, rtail, lr_avg)
+  lrtail = vcat(ltail, rtail)
 
   plot_xyc_by(
     "Tails by periods", lrtail; mark=:line_with_points,
