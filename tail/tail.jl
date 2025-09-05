@@ -82,7 +82,7 @@ optimal_tail_quantile(n) = max(0.985, 1 - 1000/n); # n > 100_000 ? 0.995 : 0.985
 # external expert opinion.
 ν_l_model(t) = 3.0 + 0.2352log(t);
 ν_r_model(t) = 3.1 + 0.4705log(t);
-v_model(t)   = 3.05 + 0.3529log(t);
+# v_model(t)   = 3.05 + 0.3529log(t);
 
 empir_surv(x) = begin
   # Collapsing duplicates for better plot
